@@ -7,6 +7,9 @@
         "php": ">=7.2.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^2.7",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.12",
         "friendsofsymfony/rest-bundle": "^3.3",
         "jms/serializer-bundle": "^4.0",
         "nelmio/api-doc-bundle": "^4.9",
@@ -15,6 +18,7 @@
         "symfony/dotenv": "*",
         "symfony/flex": "^1.17|^2",
         "symfony/framework-bundle": "*",
+        "symfony/proxy-manager-bridge": "5.4.*",
         "symfony/runtime": "*",
         "symfony/yaml": "*"
     },
