@@ -1,0 +1,9 @@
+#app/config/fos_rest.yaml
+
+fos_rest:
+    body_converter:
+        enabled: true
+    view:
+        formats: { json: true, xml: false, rss: false }
+    serializer:
+        serialize_null: true
