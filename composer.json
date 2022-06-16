@@ -9,6 +9,8 @@
         "ext-iconv": "*",
         "friendsofsymfony/rest-bundle": "^3.3",
         "jms/serializer-bundle": "^4.0",
+        "nelmio/api-doc-bundle": "^4.9",
+        "nelmio/cors-bundle": "^2.2",
         "symfony/console": "*",
         "symfony/dotenv": "*",
         "symfony/flex": "^1.17|^2",
