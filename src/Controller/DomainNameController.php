@@ -5,16 +5,15 @@ namespace App\Controller;
 use App\Entity\DomainName;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Repository\DomainNameRepository;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 
 class DomainNameController extends AbstractFOSRestController
@@ -79,21 +78,30 @@ class DomainNameController extends AbstractFOSRestController
      *      name="domaine_name_new"
      * )
      * @Rest\View(StatusCode = 201)
+     * @ParamConverter("domainName", converter="fos_rest.request_body")
+     * @param DomainName $domainName
      * @param EntityManagerInterface $em
      * @param UrlGeneratorInterface $urlGenerator
+     * @param ConstraintViolationList $violations
      */
     public function new(
-        Request $request,
+        DomainName $domainName,
         SerializerInterface $serializer,
         EntityManagerInterface $em,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        ConstraintViolationList $violations
         ): JsonResponse {
-        $domainName = $serializer->deserialize($request->getContent(), DomainName::class, 'json');
-        $em->persist($domainName);
-        $em->flush();
-        $jsonDomainName = $serializer->serialize($domainName, 'json');
-        $location = $urlGenerator->generate('domain_name_show', ['id' => $domainName->getId()], UrlGeneratorInterface::ABSOLUTE_URL); 
-        return new JsonResponse($jsonDomainName, Response::HTTP_CREATED, ["Location" => $location], true);
+            if (count($violations)) {
+                return new JsonResponse($serializer->serialize($violations, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
+
+            $em->persist($domainName);
+            $em->flush();
+
+            $jsonDomainName = $serializer->serialize($domainName, 'json');
+            $location = $urlGenerator->generate('domain_name_show', ['id' => $domainName->getId()], UrlGeneratorInterface::ABSOLUTE_URL); 
+            
+            return new JsonResponse($jsonDomainName, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
     /**
@@ -103,27 +111,24 @@ class DomainNameController extends AbstractFOSRestController
      *      requirements = {"id"="\d+"}
      * )
      * @Rest\View(StatusCode = 204)
+     * @ParamConverter("domainName", converter="fos_rest.request_body")
      * @param EntityManagerInterface $em
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param DomainNameRepository $domainNameRepository
-     * @param DomainName $currentDomaineName
+     * @param DomainName $domainName
+     * @param ConstraintViolationList $violations
      */
     public function edit(
-        Request $request,
         SerializerInterface $serializer,
         EntityManagerInterface $em,
-        UrlGeneratorInterface $urlGenerator,
-        DomainNameRepository $domainNameRepository,
-        DomainName $currentDomaineName
-        ): JsonResponse {
-            $updatedDomainName = $serializer->deserialize(
-                $request->getContent(), 
-                DomainName::class,
-                'json',
-                [AbstractNormalizer::OBJECT_TO_POPULATE => $currentDomaineName]
-            );            
-            $em->persist($updatedDomainName);
+        DomainName $domainName,
+        ConstraintViolationList $violations
+        ): JsonResponse {        
+            if (count($violations)) {
+                return new JsonResponse($serializer->serialize($violations, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
+
+            $em->persist($domainName);
             $em->flush();
+
             return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
         }
 
@@ -135,13 +140,13 @@ class DomainNameController extends AbstractFOSRestController
      * )
      * @Rest\View(StatusCode=200)
      * @param DomainName $domainName
-     * @param ManagerRegistry $doctrine
+     * @param EntityManagerInterface $em
      */
-    public function delete(DomainName $domainName, ManagerRegistry $doctrine): JsonResponse
+    public function delete(DomainName $domainName, EntityManagerInterface $em): JsonResponse
     {
-        $em = $doctrine->getManager();
         $em->remove($domainName);
         $em->flush();
+        
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
