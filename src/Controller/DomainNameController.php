@@ -130,7 +130,7 @@ class DomainNameController extends AbstractFOSRestController
     /**
      * @Rest\Delete(
      *      "/domain_names/{id}",
-     *      name="domain_name_show",
+     *      name="domain_name_delete",
      *      requirements = {"id"="\d+"}
      * )
      * @Rest\View(StatusCode=200)
