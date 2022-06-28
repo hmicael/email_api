@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Repository\DomainNameRepository;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use Symfony\Component\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -83,7 +84,8 @@ class DomainNameController extends AbstractFOSRestController
      */
     public function show(DomainName $domainName, SerializerInterface $serializer) : JsonResponse
     {
-        $data = $serializer->serialize($domainName, 'json');
+        $context = SerializationContext::create();
+        $data = $serializer->serialize($domainName, 'json', $context);
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
@@ -95,6 +97,7 @@ class DomainNameController extends AbstractFOSRestController
      * @Rest\View(StatusCode = 201)
      * @ParamConverter("domainName", converter="fos_rest.request_body")
      * @param DomainName $domainName
+     * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
      * @param UrlGeneratorInterface $urlGenerator
      * @param ConstraintViolationList $violations
@@ -139,6 +142,7 @@ class DomainNameController extends AbstractFOSRestController
      * )
      * @Rest\View(StatusCode = 204)
      * @ParamConverter("domainName", converter="fos_rest.request_body")
+     * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
      * @param DomainName $domainName
      * @param ConstraintViolationList $violations
