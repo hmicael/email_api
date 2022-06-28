@@ -182,7 +182,7 @@ class DomainNameController extends AbstractFOSRestController
         DomainName $domainName,
         EntityManagerInterface $em,
         TagAwareCacheInterface $cachePool
-    ): JsonResponse{
+    ): JsonResponse {
             $cachePool->invalidateTags(["domaineNamesCache"]);
             $em->remove($domainName);
             $em->flush();
