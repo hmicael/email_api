@@ -19,6 +19,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 /**
  * @Route("/api")
@@ -44,6 +47,27 @@ class DomainNameController extends AbstractFOSRestController
      *      default=20,
      *      description="Limit of result"
      * )
+     * @OA\Response(
+     *      response=200,
+     *      description="Return list of domain names",
+     *      @OA\JsonContent(
+     *         type="array",
+     *         @OA\Items(ref=@Model(type=DomainName::class))
+     *      )
+     * )
+     * @OA\Parameter(
+     *      name="page",
+     *      in="query",
+     *      description="Requested page number",
+     *      @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     *      name="limit",
+     *      in="query",
+     *      description="Limit of result",
+     *      @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="DomainName")   
      * @Rest\View(StatusCode=200)
      * @param DomainNameRepository $domainNameRepository
      * @param SerializerInterface $serializer
@@ -77,6 +101,18 @@ class DomainNameController extends AbstractFOSRestController
      *      name="domain_name_show",
      *      requirements = {"id"="\d+"}
      * )
+     * @OA\Response(
+     *      response=200,
+     *      description="Return detail of domain name",
+     *      @OA\Schema(type=DomainName::class)
+     * )
+     * @OA\Parameter(
+     *      name="id",
+     *      in="query",
+     *      description="Id of the domain name",
+     *      @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="DomainName") 
      * @Rest\View(StatusCode=200)
      * @param DomainName $domainName
      * @param SerializerInterface $serializer
@@ -94,6 +130,12 @@ class DomainNameController extends AbstractFOSRestController
      *      path="/domain_names",
      *      name="domaine_name_new"
      * )
+     * @OA\Response(
+     *      response=201,
+     *      description="The created domain name"
+     * )
+     * @OA\RequestBody(@Model(type=DomainName::class))
+     * @OA\Tag(name="DomainName")
      * @Rest\View(StatusCode = 201)
      * @ParamConverter("domainName", converter="fos_rest.request_body")
      * @param DomainName $domainName
@@ -140,6 +182,17 @@ class DomainNameController extends AbstractFOSRestController
      *      name="domaine_name_edit",
      *      requirements = {"id"="\d+"}
      * )
+     * @OA\Response(
+     *      response=204,
+     *      description="Edit a domain name"
+     * )
+     * @OA\Parameter(
+     *      name="id",
+     *      in="query",
+     *      description="Id of the domain name",
+     *      @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="DomainName")
      * @Rest\View(StatusCode = 204)
      * @ParamConverter("domainName", converter="fos_rest.request_body")
      * @param SerializerInterface $serializer
@@ -177,7 +230,18 @@ class DomainNameController extends AbstractFOSRestController
      *      name="domain_name_delete",
      *      requirements = {"id"="\d+"}
      * )
-     * @Rest\View(StatusCode=200)
+     * @OA\Response(
+     *      response=204,
+     *      description="Delete a domain name"
+     * )
+     * @OA\Parameter(
+     *      name="id",
+     *      in="query",
+     *      description="Id of the domain name",
+     *      @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="DomainName")
+     * @Rest\View(StatusCode=204)
      * @param DomainName $domainName
      * @param EntityManagerInterface $em
      * @param TagAwareCacheInterface $cachePool
