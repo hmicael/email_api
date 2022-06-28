@@ -110,14 +110,23 @@ class DomainNameController extends AbstractFOSRestController
         ): JsonResponse {
             $cachePool->invalidateTags(["domaineNamesCache"]);
             if (count($violations)) {
-                return new JsonResponse($serializer->serialize($violations, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse(
+                    $serializer->serialize($violations, 'json'),
+                    JsonResponse::HTTP_BAD_REQUEST,
+                    [],
+                    true
+                );
             }
 
             $em->persist($domainName);
             $em->flush();
 
             $jsonDomainName = $serializer->serialize($domainName, 'json');
-            $location = $urlGenerator->generate('domain_name_show', ['id' => $domainName->getId()], UrlGeneratorInterface::ABSOLUTE_URL); 
+            $location = $urlGenerator->generate(
+                'domain_name_show',
+                ['id' => $domainName->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ); 
             
             return new JsonResponse($jsonDomainName, Response::HTTP_CREATED, ["Location" => $location], true);
     }
@@ -144,7 +153,12 @@ class DomainNameController extends AbstractFOSRestController
         ): JsonResponse { 
             $cachePool->invalidateTags(["domaineNamesCache"]);
             if (count($violations)) {
-                return new JsonResponse($serializer->serialize($violations, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse(
+                    $serializer->serialize($violations, 'json'),
+                    JsonResponse::HTTP_BAD_REQUEST,
+                    [],
+                    true
+                );
             }
 
             $em->persist($domainName);
