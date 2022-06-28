@@ -39,9 +39,9 @@ class DomainNameRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllWithPaginate($page, $limit)
+    public function findAllWithPagination($page, $limit)
     {
-        $qb = $this->createQueryBuilder('b')
+        $qb = $this->createQueryBuilder('d')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();

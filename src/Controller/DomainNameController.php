@@ -14,8 +14,15 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
-
+/**
+ * @Route("/api")
+ * @IsGranted("ROLE_ADMIN", message="Only admin can manage domain name")
+ */
 class DomainNameController extends AbstractFOSRestController
 {
 
@@ -39,6 +46,7 @@ class DomainNameController extends AbstractFOSRestController
      * @Rest\View(StatusCode=200)
      * @param DomainNameRepository $domainNameRepository
      * @param SerializerInterface $serializer
+     * @param TagAwareCacheInterface $cachePool
      * @param $page
      * @param $limit
      * @return JsonResponse
@@ -46,13 +54,20 @@ class DomainNameController extends AbstractFOSRestController
     public function list(
         DomainNameRepository $domainNameRepository,
         SerializerInterface $serializer,
+        TagAwareCacheInterface $cachePool,
         $page = 1,
         $limit = 20
     ): JsonResponse {
-        $domainNames = $domainNameRepository->findAllWithPaginate($page, $limit);
-        $data = $serializer->serialize($domainNames, 'json');
+        $idCache = "listDomaineNames" . $page . "-" . $limit;
+        $domainNames = $cachePool->get(
+            $idCache,
+            function (ItemInterface $item) use ($domainNameRepository, $serializer, $page, $limit) {
+                $item->tag("domaineNamesCache");
+                $data = $domainNameRepository->findAllWithPagination($page, $limit);
+                return $serializer->serialize($data, 'json');
+        });
 
-        return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
+        return new JsonResponse($domainNames, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
     /**
@@ -83,14 +98,17 @@ class DomainNameController extends AbstractFOSRestController
      * @param EntityManagerInterface $em
      * @param UrlGeneratorInterface $urlGenerator
      * @param ConstraintViolationList $violations
+     * @param TagAwareCacheInterface $cachePool
      */
     public function new(
         DomainName $domainName,
         SerializerInterface $serializer,
         EntityManagerInterface $em,
         UrlGeneratorInterface $urlGenerator,
-        ConstraintViolationList $violations
+        ConstraintViolationList $violations,
+        TagAwareCacheInterface $cachePool
         ): JsonResponse {
+            $cachePool->invalidateTags(["domaineNamesCache"]);
             if (count($violations)) {
                 return new JsonResponse($serializer->serialize($violations, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
             }
@@ -115,13 +133,16 @@ class DomainNameController extends AbstractFOSRestController
      * @param EntityManagerInterface $em
      * @param DomainName $domainName
      * @param ConstraintViolationList $violations
+     * @param TagAwareCacheInterface $cachePool
      */
     public function edit(
         SerializerInterface $serializer,
         EntityManagerInterface $em,
         DomainName $domainName,
-        ConstraintViolationList $violations
-        ): JsonResponse {        
+        ConstraintViolationList $violations,
+        TagAwareCacheInterface $cachePool
+        ): JsonResponse { 
+            $cachePool->invalidateTags(["domaineNamesCache"]);
             if (count($violations)) {
                 return new JsonResponse($serializer->serialize($violations, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
             }
@@ -141,12 +162,17 @@ class DomainNameController extends AbstractFOSRestController
      * @Rest\View(StatusCode=200)
      * @param DomainName $domainName
      * @param EntityManagerInterface $em
+     * @param TagAwareCacheInterface $cachePool
      */
-    public function delete(DomainName $domainName, EntityManagerInterface $em): JsonResponse
-    {
-        $em->remove($domainName);
-        $em->flush();
-        
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    public function delete(
+        DomainName $domainName,
+        EntityManagerInterface $em,
+        TagAwareCacheInterface $cachePool
+    ): JsonResponse{
+            $cachePool->invalidateTags(["domaineNamesCache"]);
+            $em->remove($domainName);
+            $em->flush();
+            
+            return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

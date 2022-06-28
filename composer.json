@@ -13,6 +13,7 @@
         "doctrine/orm": "^2.12",
         "friendsofsymfony/rest-bundle": "^3.3",
         "jms/serializer-bundle": "^4.0",
+        "lexik/jwt-authentication-bundle": "^2.16",
         "nelmio/api-doc-bundle": "^4.9",
         "nelmio/cors-bundle": "^2.2",
         "phpdocumentor/reflection-docblock": "^5.3",
@@ -27,6 +28,7 @@
         "symfony/property-info": "5.4.*",
         "symfony/proxy-manager-bridge": "5.4.*",
         "symfony/runtime": "*",
+        "symfony/security-bundle": "5.4.*",
         "symfony/serializer": "5.4.*",
         "symfony/validator": "5.4.*",
         "symfony/yaml": "*"
