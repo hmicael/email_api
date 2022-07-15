@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Repository\DomainNameRepository;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -32,7 +31,7 @@ class DomainNameController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
-     *      "/domain_names"),
+     *      "/domain-names"),
      *      name="domain_name_list"
      * )
      * @QueryParam(
@@ -97,7 +96,7 @@ class DomainNameController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
-     *      "/domain_names/{id}",
+     *      "/domain-names/{id}",
      *      name="domain_name_show",
      *      requirements = {"id"="\d+"}
      * )
@@ -120,15 +119,14 @@ class DomainNameController extends AbstractFOSRestController
      */
     public function show(DomainName $domainName, SerializerInterface $serializer) : JsonResponse
     {
-        $context = SerializationContext::create();
-        $data = $serializer->serialize($domainName, 'json', $context);
+        $data = $serializer->serialize($domainName, 'json');
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
     /**
      * @Rest\Post(
-     *      path="/domain_names",
-     *      name="domaine_name_new"
+     *      path="/domain-names",
+     *      name="domain_name_new"
      * )
      * @OA\Response(
      *      response=201,
@@ -178,8 +176,8 @@ class DomainNameController extends AbstractFOSRestController
 
     /**
      * @Rest\Put(
-     *      path="/domain_names/{id}",
-     *      name="domaine_name_edit",
+     *      path="/domain-names/{id}",
+     *      name="domain_name_edit",
      *      requirements = {"id"="\d+"}
      * )
      * @OA\Response(
@@ -226,7 +224,7 @@ class DomainNameController extends AbstractFOSRestController
 
     /**
      * @Rest\Delete(
-     *      "/domain_names/{id}",
+     *      "/domain-names/{id}",
      *      name="domain_name_delete",
      *      requirements = {"id"="\d+"}
      * )

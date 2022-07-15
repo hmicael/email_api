@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\DomainNameRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -10,7 +12,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @ORM\Entity(repositoryClass=DomainNameRepository::class)
- * @UniqueEntity(fields="name", message="Domain name already taken")
+ * @UniqueEntity(fields="name", message="The domain name '{{ value }}' is already taken")
  * @Hateoas\Relation(
  *      "self",
  *      href = @Hateoas\Route(
@@ -30,7 +32,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation(
  *      "update",
  *      href = @Hateoas\Route(
- *          "domaine_name_edit",
+ *          "domain_name_edit",
  *          parameters = { "id" = "expr(object.getId())" },
  *      )
  * )
@@ -50,6 +52,16 @@ class DomainName
      */
     private $name;
 
+    /**
+     * @ORM\OneToMany(targetEntity=VirtualUser::class, mappedBy="domainName", orphanRemoval=true)
+     */
+    private $virtualUsers;
+
+    public function __construct()
+    {
+        $this->virtualUsers = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -63,6 +75,36 @@ class DomainName
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VirtualUser>
+     */
+    public function getVirtualUsers(): Collection
+    {
+        return $this->virtualUsers;
+    }
+
+    public function addVirtualUser(VirtualUser $virtualUser): self
+    {
+        if (!$this->virtualUsers->contains($virtualUser)) {
+            $this->virtualUsers[] = $virtualUser;
+            $virtualUser->setDomainName($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVirtualUser(VirtualUser $virtualUser): self
+    {
+        if ($this->virtualUsers->removeElement($virtualUser)) {
+            // set the owning side to null (unless already changed)
+            if ($virtualUser->getDomainName() === $this) {
+                $virtualUser->setDomainName(null);
+            }
+        }
 
         return $this;
     }
