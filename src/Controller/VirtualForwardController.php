@@ -13,6 +13,7 @@ use App\Repository\VirtualForwardRepository;
 use App\Repository\DomainNameRepository;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Routing\Annotation\Route;
@@ -92,7 +93,11 @@ class VirtualForwardController extends AbstractFOSRestController
             function (ItemInterface $item) use ($virtualForwardRepository, $serializer, $page, $limit) {
                 $item->tag("virtualForwardsCache");
                 $data = $virtualForwardRepository->findAllWithPagination($page, $limit);
-                return $serializer->serialize($data, 'json');
+                return $serializer->serialize(
+                    $data,
+                    'json',
+                    SerializationContext::create()->setGroups(array('list'))
+                );
         });
 
         return new JsonResponse($virtualForwards, Response::HTTP_OK, ['accept' => 'json'], true);
@@ -123,7 +128,11 @@ class VirtualForwardController extends AbstractFOSRestController
      */
     public function show(VirtualForward $virtualForward, SerializerInterface $serializer) : JsonResponse
     {
-        $data = $serializer->serialize($virtualForward, 'json');
+        $data = $serializer->serialize(
+            $virtualForward,
+            'json',
+            SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getUsers'))
+        );
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 

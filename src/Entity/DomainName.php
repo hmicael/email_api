@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=DomainNameRepository::class)
@@ -43,27 +44,32 @@ class DomainName
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"list", "getDomainNames"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=20)
      * @Assert\NotBlank(message = "Name cannot be blank")
+     * @Groups({"list", "getDomainNames"})
      */
     private $name;
 
     /**
      * @ORM\OneToMany(targetEntity=VirtualUser::class, mappedBy="domainName", orphanRemoval=true)
+     * @Groups({"showDomainName"})
      */
     private $virtualUsers;
 
     /**
      * @ORM\OneToMany(targetEntity=VirtualAlias::class, mappedBy="domainName", orphanRemoval=true)
+     * @Groups({"showDomainName"})
      */
     private $virtualAliases;
 
     /**
      * @ORM\OneToMany(targetEntity=VirtualForward::class, mappedBy="domainName", orphanRemoval=true)
+     * @Groups({"showDomainName"})
      */
     private $virtualForwards;
 

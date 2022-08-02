@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=VirtualAliasRepository::class)
@@ -43,23 +44,27 @@ class VirtualAlias
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"list", "getAliases"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=30)
      * @Assert\Email()
+     * @Groups({"list", "getAliases"})
      */
     private $source;
 
     /**
      * @ORM\ManyToOne(targetEntity=DomainName::class, inversedBy="virtualAliases")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"getDomainNames"})
      */
     private $domainName;
 
     /**
      * @ORM\ManyToMany(targetEntity=VirtualUser::class, inversedBy="virtualAliases")
+     * @Groups({"getUsers"})
      */
     private $virtualUsers;
 

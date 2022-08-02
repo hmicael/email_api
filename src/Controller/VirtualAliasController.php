@@ -13,6 +13,7 @@ use App\Repository\VirtualAliasRepository;
 use App\Repository\DomainNameRepository;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Routing\Annotation\Route;
@@ -92,7 +93,11 @@ class VirtualAliasController extends AbstractFOSRestController
             function (ItemInterface $item) use ($virtualAliasRepository, $serializer, $page, $limit) {
                 $item->tag("virtualAliasesCache");
                 $data = $virtualAliasRepository->findAllWithPagination($page, $limit);
-                return $serializer->serialize($data, 'json');
+                return $serializer->serialize(
+                    $data,
+                    'json',
+                    SerializationContext::create()->setGroups(array('list'))
+                );
         });
 
         return new JsonResponse($virtualAliass, Response::HTTP_OK, ['accept' => 'json'], true);
@@ -123,7 +128,11 @@ class VirtualAliasController extends AbstractFOSRestController
      */
     public function show(VirtualAlias $virtualAlias, SerializerInterface $serializer) : JsonResponse
     {
-        $data = $serializer->serialize($virtualAlias, 'json');
+        $data = $serializer->serialize(
+            $virtualAlias,
+            'json',
+            SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getUsers'))
+        );
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 

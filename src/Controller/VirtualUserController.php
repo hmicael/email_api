@@ -12,6 +12,7 @@ use App\Repository\VirtualUserRepository;
 use App\Repository\DomainNameRepository;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Routing\Annotation\Route;
@@ -90,7 +91,11 @@ class VirtualUserController extends AbstractFOSRestController
             function (ItemInterface $item) use ($virtualUserRepository, $serializer, $page, $limit) {
                 $item->tag("virtualUserCache");
                 $data = $virtualUserRepository->findAllWithPagination($page, $limit);
-                return $serializer->serialize($data, 'json');
+                return $serializer->serialize(
+                    $data,
+                    'json',
+                    SerializationContext::create()->setGroups(array('list', 'getDomainNames'))
+                );
         });
 
         return new JsonResponse($virtualUsers, Response::HTTP_OK, ['accept' => 'json'], true);
@@ -121,7 +126,11 @@ class VirtualUserController extends AbstractFOSRestController
      */
     public function show(VirtualUser $virtualUser, SerializerInterface $serializer) : JsonResponse
     {
-        $data = $serializer->serialize($virtualUser, 'json');
+        $data = $serializer->serialize(
+            $virtualUser,
+            'json',
+            SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getAliases', "getForwards"))
+        );
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 

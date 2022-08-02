@@ -8,9 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Hateoas\Configuration\Annotation as Hateoas;
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=VirtualUserRepository::class)
@@ -45,35 +44,41 @@ class VirtualUser
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"list", "getUsers"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=20)
      * @Assert\NotBlank(message = "Name cannot be blank")
+     * @Groups({"list", "getUsers"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
+     * @Groups({"list", "getUsers"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=30)
      * @Assert\NotBlank(message = "Email cannot be blank")
+     * @Groups({"list", "getUsers"})
      * @Assert\Email()
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"list", "getUsers"})
      */
     private $maildir;
 
     /**
      * @ORM\ManyToOne(targetEntity=DomainName::class, inversedBy="virtualUsers")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"getDomainNames"})
      */
     private $domainName;
 
@@ -88,17 +93,18 @@ class VirtualUser
      *     pattern="/^((?=.+[a-zA-Z])(?=.+[0-9])|(?=.+[,<>\\\+\?\)\(\-\/;\.!@#\$%\^&\*]))(?=.{12,})/",
      *     message="Password must contain atleast one uppercase and lowercase letters, one number, and one special character"
      * )
-     * @Serializer\Exclude
      */
     private $password;
 
     /**
      * @ORM\ManyToMany(targetEntity=VirtualAlias::class, mappedBy="virtualUsers")
+     * @Groups({"getAliases"})
      */
     private $virtualAliases;
 
     /**
      * @ORM\ManyToMany(targetEntity=VirtualForward::class, mappedBy="virtualUsers")
+     * @Groups({"getForwards"})
      */
     private $virtualForwards;
 

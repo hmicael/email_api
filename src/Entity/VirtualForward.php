@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=VirtualForwardRepository::class)
@@ -43,23 +44,27 @@ class VirtualForward
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"list", "getForwards"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=30)
      * @Assert\Email()
+     * @Groups({"list", "getForwards"})
      */
     private $source;
 
     /**
-     * @ORM\ManyToOne(targetEntity=DomainName::class, inversedBy="virtualForwardes")
+     * @ORM\ManyToOne(targetEntity=DomainName::class, inversedBy="virtualForwards")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"getDomainNames"})
      */
     private $domainName;
 
     /**
-     * @ORM\ManyToMany(targetEntity=VirtualUser::class, inversedBy="virtualForwardes")
+     * @ORM\ManyToMany(targetEntity=VirtualUser::class, inversedBy="virtualForwards")
+     * @Groups({"getUsers"})
      */
     private $virtualUsers;
 

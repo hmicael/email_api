@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Repository\DomainNameRepository;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -88,7 +89,11 @@ class DomainNameController extends AbstractFOSRestController
             function (ItemInterface $item) use ($domainNameRepository, $serializer, $page, $limit) {
                 $item->tag("domaineNamesCache");
                 $data = $domainNameRepository->findAllWithPagination($page, $limit);
-                return $serializer->serialize($data, 'json');
+                return $serializer->serialize(
+                    $data, 
+                    'json',
+                    SerializationContext::create()->setGroups(array('list'))
+                );
         });
 
         return new JsonResponse($domainNames, Response::HTTP_OK, ['accept' => 'json'], true);
@@ -119,7 +124,11 @@ class DomainNameController extends AbstractFOSRestController
      */
     public function show(DomainName $domainName, SerializerInterface $serializer) : JsonResponse
     {
-        $data = $serializer->serialize($domainName, 'json');
+        $data = $serializer->serialize(
+            $domainName,
+            'json',
+            SerializationContext::create()->setGroups(array('list', 'showDomainName'))
+        );
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
