@@ -57,9 +57,21 @@ class DomainName
      */
     private $virtualUsers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=VirtualAlias::class, mappedBy="domainName", orphanRemoval=true)
+     */
+    private $virtualAliases;
+
+    /**
+     * @ORM\OneToMany(targetEntity=VirtualForward::class, mappedBy="domainName", orphanRemoval=true)
+     */
+    private $virtualForwards;
+
     public function __construct()
     {
         $this->virtualUsers = new ArrayCollection();
+        $this->virtualAliases = new ArrayCollection();
+        $this->virtualForwards = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -103,6 +115,66 @@ class DomainName
             // set the owning side to null (unless already changed)
             if ($virtualUser->getDomainName() === $this) {
                 $virtualUser->setDomainName(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VirtualAlias>
+     */
+    public function getVirtualAliases(): Collection
+    {
+        return $this->virtualAliases;
+    }
+
+    public function addVirtualAlias(VirtualAlias $virtualAlias): self
+    {
+        if (!$this->virtualAliases->contains($virtualAlias)) {
+            $this->virtualAliases[] = $virtualAlias;
+            $virtualAlias->setDomainName($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVirtualAlias(VirtualAlias $virtualAlias): self
+    {
+        if ($this->virtualAliases->removeElement($virtualAlias)) {
+            // set the owning side to null (unless already changed)
+            if ($virtualAlias->getDomainName() === $this) {
+                $virtualAlias->setDomainName(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VirtualForward>
+     */
+    public function getVirtualForwards(): Collection
+    {
+        return $this->virtualForwards;
+    }
+
+    public function addVirtualForward(VirtualForward $virtualForward): self
+    {
+        if (!$this->virtualForwards->contains($virtualForward)) {
+            $this->virtualForwards[] = $virtualForward;
+            $virtualForward->setDomainName($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVirtualForward(VirtualForward $virtualForward): self
+    {
+        if ($this->virtualForwards->removeElement($virtualForward)) {
+            // set the owning side to null (unless already changed)
+            if ($virtualForward->getDomainName() === $this) {
+                $virtualForward->setDomainName(null);
             }
         }
 

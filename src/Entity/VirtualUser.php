@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\VirtualUserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Hateoas\Configuration\Annotation as Hateoas;
@@ -58,7 +60,7 @@ class VirtualUser
     private $firstname;
 
     /**
-     * @ORM\Column(type="string", length=20)
+     * @ORM\Column(type="string", length=30)
      * @Assert\NotBlank(message = "Email cannot be blank")
      * @Assert\Email()
      */
@@ -89,6 +91,22 @@ class VirtualUser
      * @Serializer\Exclude
      */
     private $password;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=VirtualAlias::class, mappedBy="virtualUsers")
+     */
+    private $virtualAliases;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=VirtualForward::class, mappedBy="virtualUsers")
+     */
+    private $virtualForwards;
+
+    public function __construct()
+    {
+        $this->virtualAliases = new ArrayCollection();
+        $this->virtualForwards = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -163,6 +181,60 @@ class VirtualUser
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VirtualAlias>
+     */
+    public function getVirtualAliases(): Collection
+    {
+        return $this->virtualAliases;
+    }
+
+    public function addVirtualAlias(VirtualAlias $virtualAlias): self
+    {
+        if (!$this->virtualAliases->contains($virtualAlias)) {
+            $this->virtualAliases[] = $virtualAlias;
+            $virtualAlias->addVirtualUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVirtualAlias(VirtualAlias $virtualAlias): self
+    {
+        if ($this->virtualAliases->removeElement($virtualAlias)) {
+            $virtualAlias->removeVirtualUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VirtualForward>
+     */
+    public function getVirtualForwards(): Collection
+    {
+        return $this->virtualForwards;
+    }
+
+    public function addVirtualForward(VirtualForward $virtualForward): self
+    {
+        if (!$this->virtualForwards->contains($virtualForward)) {
+            $this->virtualForwards[] = $virtualForward;
+            $virtualForward->addVirtualUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVirtualForward(VirtualForward $virtualForward): self
+    {
+        if ($this->virtualForwards->removeElement($virtualForward)) {
+            $virtualForward->removeVirtualUser($this);
+        }
 
         return $this;
     }

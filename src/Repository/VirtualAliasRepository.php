@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\VirtualUser;
+use App\Entity\VirtualAlias;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<VirtualUser>
+ * @extends ServiceEntityRepository<VirtualAlias>
  *
- * @method VirtualUser|null find($id, $lockMode = null, $lockVersion = null)
- * @method VirtualUser|null findOneBy(array $criteria, array $orderBy = null)
- * @method VirtualUser[]    findAll()
- * @method VirtualUser[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method VirtualAlias|null find($id, $lockMode = null, $lockVersion = null)
+ * @method VirtualAlias|null findOneBy(array $criteria, array $orderBy = null)
+ * @method VirtualAlias[]    findAll()
+ * @method VirtualAlias[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class VirtualUserRepository extends ServiceEntityRepository
+class VirtualAliasRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, VirtualUser::class);
+        parent::__construct($registry, VirtualAlias::class);
     }
 
-    public function add(VirtualUser $entity, bool $flush = false): void
+    public function add(VirtualAlias $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class VirtualUserRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(VirtualUser $entity, bool $flush = false): void
+    public function remove(VirtualAlias $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -48,7 +48,7 @@ class VirtualUserRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return VirtualUser[] Returns an array of VirtualUser objects
+//     * @return VirtualAlias[] Returns an array of VirtualAlias objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -62,7 +62,7 @@ class VirtualUserRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?VirtualUser
+//    public function findOneBySomeField($value): ?VirtualAlias
 //    {
 //        return $this->createQueryBuilder('v')
 //            ->andWhere('v.exampleField = :val')

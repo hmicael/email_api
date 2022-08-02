@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\VirtualUser;
+use App\Entity\VirtualForward;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<VirtualUser>
+ * @extends ServiceEntityRepository<VirtualForward>
  *
- * @method VirtualUser|null find($id, $lockMode = null, $lockVersion = null)
- * @method VirtualUser|null findOneBy(array $criteria, array $orderBy = null)
- * @method VirtualUser[]    findAll()
- * @method VirtualUser[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method VirtualForward|null find($id, $lockMode = null, $lockVersion = null)
+ * @method VirtualForward|null findOneBy(array $criteria, array $orderBy = null)
+ * @method VirtualForward[]    findAll()
+ * @method VirtualForward[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class VirtualUserRepository extends ServiceEntityRepository
+class VirtualForwardRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, VirtualUser::class);
+        parent::__construct($registry, VirtualForward::class);
     }
 
-    public function add(VirtualUser $entity, bool $flush = false): void
+    public function add(VirtualForward $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class VirtualUserRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(VirtualUser $entity, bool $flush = false): void
+    public function remove(VirtualForward $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -48,7 +48,7 @@ class VirtualUserRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return VirtualUser[] Returns an array of VirtualUser objects
+//     * @return VirtualForward[] Returns an array of VirtualForward objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -62,7 +62,7 @@ class VirtualUserRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?VirtualUser
+//    public function findOneBySomeField($value): ?VirtualForward
 //    {
 //        return $this->createQueryBuilder('v')
 //            ->andWhere('v.exampleField = :val')

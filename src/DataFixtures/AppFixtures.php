@@ -4,6 +4,8 @@ namespace App\DataFixtures;
 
 use App\Entity\DomainName;
 use App\Entity\VirtualUser;
+use App\Entity\VirtualAlias;
+use App\Entity\VirtualForward;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -53,6 +55,22 @@ class AppFixtures extends Fixture
             $users[$i]->setMaildir("maildir-" . (int)($i+1));
             $users[$i]->setPassword("1698@Igy");
             $manager->persist($users[$i]);
+        }
+
+        $alias = [];
+        for($i = 0; $i < 3; $i++) {
+            $alias[$i] = new VirtualAlias();
+            $alias[$i]->setSource("source-" . (int)($i+1));
+            $alias[$i]->setDomainName($domains[0]);
+            $manager->persist($alias[$i]);
+        }
+
+        $forward = [];
+        for($i = 0; $i < 3; $i++) {
+            $forward[$i] = new VirtualForward();
+            $forward[$i]->setSource("source-" . (int)($i+1));
+            $forward[$i]->setDomainName($domains[0]);
+            $manager->persist($forward[$i]);
         }
 
         $manager->flush();
