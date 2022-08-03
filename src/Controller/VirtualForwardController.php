@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/api")
- * @IsGranted("ROLE_ADMIN", message="Only admin can manage Virtual Forward")
+ * @IsGranted("ROLE_USER", message="Only user can manage Virtual Forward")
  */
 class VirtualForwardController extends AbstractFOSRestController
 {

@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/api")
- * @IsGranted("ROLE_USER", message="You have to log in to manage Virtual User")
+ * @IsGranted("ROLE_USER", message="Only user can manage Virtual User")
  */
 class VirtualUserController extends AbstractFOSRestController
 {

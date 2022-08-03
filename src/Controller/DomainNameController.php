@@ -25,7 +25,7 @@ use OpenApi\Annotations as OA;
 
 /**
  * @Route("/api")
- * @IsGranted("ROLE_ADMIN", message="Only admin can manage domain name")
+ * @IsGranted("ROLE_USER", message="Only user can manage domain name")
  */
 class DomainNameController extends AbstractFOSRestController
 {
@@ -145,6 +145,7 @@ class DomainNameController extends AbstractFOSRestController
      * @OA\Tag(name="DomainName")
      * @Rest\View(StatusCode = 201)
      * @ParamConverter("domainName", converter="fos_rest.request_body")
+     * @IsGranted("ROLE_ADMIN", message="Only admin can create domain name")
      * @param DomainName $domainName
      * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
@@ -202,6 +203,7 @@ class DomainNameController extends AbstractFOSRestController
      * @OA\Tag(name="DomainName")
      * @Rest\View(StatusCode = 204)
      * @ParamConverter("domainName", converter="fos_rest.request_body")
+     * @IsGranted("ROLE_ADMIN", message="Only admin can edit domain name")
      * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
      * @param DomainName $domainName
@@ -249,6 +251,7 @@ class DomainNameController extends AbstractFOSRestController
      * )
      * @OA\Tag(name="DomainName")
      * @Rest\View(StatusCode=204)
+     * @IsGranted("ROLE_ADMIN", message="Only admin can delete domain name")
      * @param DomainName $domainName
      * @param EntityManagerInterface $em
      * @param TagAwareCacheInterface $cachePool

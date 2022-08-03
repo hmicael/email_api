@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/api")
- * @IsGranted("ROLE_ADMIN", message="Only admin can manage Virtual Alias")
+ * @IsGranted("ROLE_USER", message="Only user can manage Virtual Alias")
  */
 class VirtualAliasController extends AbstractFOSRestController
 {
@@ -196,8 +196,9 @@ class VirtualAliasController extends AbstractFOSRestController
 
             $em->persist($virtualAlias);
             $em->flush();
-
-            $jsonVirtualAlias = $serializer->serialize($virtualAlias, 'json');
+           
+            $context = SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getVirtualUsers'));
+            $jsonVirtualAlias = $serializer->serialize($virtualAlias, 'json', $context);
             $location = $urlGenerator->generate(
                 'virtual_alias_show',
                 ['id' => $virtualAlias->getId()],
