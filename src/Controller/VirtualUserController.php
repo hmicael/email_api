@@ -171,7 +171,7 @@ class VirtualUserController extends AbstractFOSRestController
                 $virtualUser->setPassword($content["password"]); 
             }
             $errors = $validator->validate($virtualUser);
-            if (count($errors) || ! $content['idDomainName']) {
+            if (count($errors) > 0 || ! $content['idDomainName']) {
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,
@@ -256,7 +256,7 @@ class VirtualUserController extends AbstractFOSRestController
                 $virtualUser->setPassword($content["password"]);
             }
             $errors = $validator->validate($virtualUser);
-            if (count($errors) || ! $content['idDomainName']) {
+            if (count($errors) > 0 || ! $content['idDomainName']) {
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,

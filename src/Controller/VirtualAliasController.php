@@ -170,7 +170,7 @@ class VirtualAliasController extends AbstractFOSRestController
             $content = $request->toArray();
 
             $errors = $validator->validate($virtualAlias);
-            if (count($errors) || ! $content['idDomainName']) {
+            if (count($errors) > 0 || ! $content['idDomainName']) {
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,
@@ -246,7 +246,7 @@ class VirtualAliasController extends AbstractFOSRestController
             $cachePool->invalidateTags(["virtualAliasesCache"]);
             $content = $request->toArray();
             $errors = $validator->validate($virtualAlias);
-            if (count($errors) || ! $content['idDomainName']) {
+            if (count($errors) > 0 || ! $content['idDomainName']) {
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,

@@ -170,7 +170,7 @@ class VirtualForwardController extends AbstractFOSRestController
             $content = $request->toArray();
 
             $errors = $validator->validate($virtualForward);
-            if (count($errors) || ! $content['idDomainName']) {
+            if (count($errors) > 0 || ! $content['idDomainName']) {
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,
@@ -246,7 +246,7 @@ class VirtualForwardController extends AbstractFOSRestController
             $cachePool->invalidateTags(["virtualForwardsCache"]);
             $content = $request->toArray();
             $errors = $validator->validate($virtualForward);
-            if (count($errors) || ! $content['idDomainName']) {
+            if (count($errors) > 0 || ! $content['idDomainName']) {
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,
