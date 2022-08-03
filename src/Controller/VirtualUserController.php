@@ -203,7 +203,11 @@ class VirtualUserController extends AbstractFOSRestController
             $em->persist($virtualUser);
             $em->flush();
             
-            $jsonVirtualUser = $serializer->serialize($virtualUser, 'json');
+            $jsonVirtualUser = $serializer->serialize(
+                $virtualUser,
+                'json',
+                SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getAliases', "getForwards"))
+            );
             $location = $urlGenerator->generate(
                 'virtual_user_show',
                 ['id' => $virtualUser->getId()],

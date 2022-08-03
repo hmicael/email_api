@@ -50,6 +50,7 @@ class VirtualForward
 
     /**
      * @ORM\Column(type="string", length=30)
+     * @Assert\NotBlank(message = "Source cannot be blank")
      * @Assert\Email()
      * @Groups({"list", "getForwards"})
      */

@@ -27,6 +27,8 @@ class AppFixtures extends Fixture
         // Création d'un user "normal"
         $user = new User();
         $user->setEmail("user@bookapi.com");
+        $user->setName("Henintsoa");
+        $user->setFirstname("Mica");
         $user->setRoles(["ROLE_USER"]);
         $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
         $manager->persist($user);
@@ -35,6 +37,8 @@ class AppFixtures extends Fixture
         $userAdmin = new User();
         $userAdmin->setEmail("admin@email.com");
         $userAdmin->setRoles(["ROLE_ADMIN"]);
+        $userAdmin->setName("Henintsoa");
+        $userAdmin->setFirstname("Mica");
         $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "admin"));
         $manager->persist($userAdmin);
 

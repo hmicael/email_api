@@ -197,7 +197,11 @@ class VirtualForwardController extends AbstractFOSRestController
             $em->persist($virtualForward);
             $em->flush();
 
-            $jsonVirtualForward = $serializer->serialize($virtualForward, 'json');
+            $jsonVirtualForward = $serializer->serialize(
+                $virtualForward,
+                'json',
+                SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getVirtualUsers'))
+            );
             $location = $urlGenerator->generate(
                 'virtual_forward_show',
                 ['id' => $virtualForward->getId()],

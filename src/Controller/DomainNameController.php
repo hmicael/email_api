@@ -174,7 +174,11 @@ class DomainNameController extends AbstractFOSRestController
             $em->persist($domainName);
             $em->flush();
 
-            $jsonDomainName = $serializer->serialize($domainName, 'json');
+            $jsonDomainName = $serializer->serialize(
+                $domainName,
+                'json',
+                SerializationContext::create()->setGroups(array('list', 'showDomainName'))
+            );
             $location = $urlGenerator->generate(
                 'domain_name_show',
                 ['id' => $domainName->getId()],

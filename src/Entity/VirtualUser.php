@@ -51,12 +51,14 @@ class VirtualUser
     /**
      * @ORM\Column(type="string", length=20)
      * @Assert\NotBlank(message = "Name cannot be blank")
+     * @Assert\Type("string")
      * @Groups({"list", "getVirtualUsers"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
+     * @Assert\Type("string")
      * @Groups({"list", "getVirtualUsers"})
      */
     private $firstname;
@@ -64,13 +66,14 @@ class VirtualUser
     /**
      * @ORM\Column(type="string", length=30)
      * @Assert\NotBlank(message = "Email cannot be blank")
-     * @Groups({"list", "getVirtualUsers"})
      * @Assert\Email()
+     * @Groups({"list", "getVirtualUsers"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Assert\Type("string")
      * @Groups({"list", "getVirtualUsers"})
      */
     private $maildir;
@@ -86,11 +89,11 @@ class VirtualUser
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank(message = "Password cannot be blank")
      * @Assert\Length(
-     *     min = 12,
+     *     min = 8,
      *     minMessage = "Password must be {{ limit }} characters"
      * )
      * @Assert\Regex(
-     *     pattern="/^((?=.+[a-zA-Z])(?=.+[0-9])|(?=.+[,<>\\\+\?\)\(\-\/;\.!@#\$%\^&\*]))(?=.{12,})/",
+     *     pattern="/^((?=.+[a-zA-Z])(?=.+[0-9])|(?=.+[,<>\\\+\?\)\(\-\/;\.!@#\$%\^&\*]))(?=.{8,})/",
      *     message="Password must contain atleast one uppercase and lowercase letters, one number, and one special character"
      * )
      */

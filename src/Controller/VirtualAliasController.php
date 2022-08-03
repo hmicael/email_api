@@ -197,8 +197,11 @@ class VirtualAliasController extends AbstractFOSRestController
             $em->persist($virtualAlias);
             $em->flush();
            
-            $context = SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getVirtualUsers'));
-            $jsonVirtualAlias = $serializer->serialize($virtualAlias, 'json', $context);
+            $jsonVirtualAlias = $serializer->serialize(
+                $virtualAlias,
+                'json',
+                SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getVirtualUsers'))
+            );
             $location = $urlGenerator->generate(
                 'virtual_alias_show',
                 ['id' => $virtualAlias->getId()],

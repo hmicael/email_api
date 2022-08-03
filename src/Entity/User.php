@@ -6,10 +6,38 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation as JMSSerializer;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(fields="email", message="The email '{{ value }}' is already taken")
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "user_show",
+ *          parameters = { "id" = "expr(object.getId())" }
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "delete",
+ *      href = @Hateoas\Route(
+ *          "user_delete",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *      )
+ * )
+ *
+ * @Hateoas\Relation(
+ *      "update",
+ *      href = @Hateoas\Route(
+ *          "user_edit",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *      )
+ * )
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -17,24 +45,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"list"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\NotBlank(message = "Email cannot be blank")
+     * @Assert\Email()
+     * @Groups({"list"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
+     * @JMSSerializer\Type("array")
+     * @Assert\Type("array")
+     * @Groups({"list"})
      */
     private $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\Regex(
+     *     pattern="/^((?=.+[a-zA-Z])(?=.+[0-9])|(?=.+[,<>\\\+\?\)\(\-\/;\.!@#\$%\^&\*]))(?=.{8,})/",
+     *     message="Password must contain atleast one uppercase and lowercase letters, one number, and one special character"
+     * )
+     * @Assert\Length(
+     *     min = 8,
+     *     minMessage = "Password must be {{ limit }} characters"
+     * )
      */
     private $password;
+
+    /**
+     * @ORM\Column(type="string", length=30)
+     * @Assert\NotBlank(message = "Name cannot be blank")
+     * @Assert\Type("string")
+     * @Groups({"list"})
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=30)
+     * @Assert\NotBlank(message = "Firstname cannot be blank")
+     * @Assert\Type("string")
+     * @Groups({"list"})
+     */
+    private $firstname;
 
     public function getId(): ?int
     {
@@ -123,5 +182,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): self
+    {
+        $this->firstname = $firstname;
+
+        return $this;
     }
 }
