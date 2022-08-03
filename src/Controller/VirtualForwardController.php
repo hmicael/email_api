@@ -131,7 +131,7 @@ class VirtualForwardController extends AbstractFOSRestController
         $data = $serializer->serialize(
             $virtualForward,
             'json',
-            SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getUsers'))
+            SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getVirtualUsers'))
         );
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }

@@ -44,34 +44,34 @@ class VirtualUser
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"list", "getUsers"})
+     * @Groups({"list", "getVirtualUsers"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=20)
      * @Assert\NotBlank(message = "Name cannot be blank")
-     * @Groups({"list", "getUsers"})
+     * @Groups({"list", "getVirtualUsers"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
-     * @Groups({"list", "getUsers"})
+     * @Groups({"list", "getVirtualUsers"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=30)
      * @Assert\NotBlank(message = "Email cannot be blank")
-     * @Groups({"list", "getUsers"})
+     * @Groups({"list", "getVirtualUsers"})
      * @Assert\Email()
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"list", "getUsers"})
+     * @Groups({"list", "getVirtualUsers"})
      */
     private $maildir;
 

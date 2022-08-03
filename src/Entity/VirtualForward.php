@@ -64,7 +64,7 @@ class VirtualForward
 
     /**
      * @ORM\ManyToMany(targetEntity=VirtualUser::class, inversedBy="virtualForwards")
-     * @Groups({"getUsers"})
+     * @Groups({"getVirtualUsers"})
      */
     private $virtualUsers;
 

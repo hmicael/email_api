@@ -64,7 +64,7 @@ class VirtualAlias
 
     /**
      * @ORM\ManyToMany(targetEntity=VirtualUser::class, inversedBy="virtualAliases")
-     * @Groups({"getUsers"})
+     * @Groups({"getVirtualUsers"})
      */
     private $virtualUsers;
 
