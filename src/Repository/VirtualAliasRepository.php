@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\VirtualAlias;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Repository\AbstractRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method VirtualAlias[]    findAll()
  * @method VirtualAlias[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class VirtualAliasRepository extends ServiceEntityRepository
+class VirtualAliasRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -39,11 +39,17 @@ class VirtualAliasRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllWithPagination($page, $limit)
+    public function search($domainId, $keyword)
     {
-        $qb = $this->createQueryBuilder('v')
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
+        $qb = $this
+            ->createQueryBuilder('v')
+            ->select('v')            
+            ->andWhere('v.source like :keyword')
+            ->andWhere('v.domainName = :domainId')
+            ->setParameter('domainId', $domainId)
+            ->setParameter('keyword', '%'. $keyword .'%')
+            ->orderBy('v.source', 'asc');
+
         return $qb->getQuery()->getResult();
     }
 

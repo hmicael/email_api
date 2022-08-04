@@ -3,18 +3,18 @@
 namespace App\Repository;
 
 use App\Entity\DomainName;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Repository\AbstractRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<DomainName>
+ * @extends AbstractRepository<DomainName>
  *
  * @method DomainName|null find($id, $lockMode = null, $lockVersion = null)
  * @method DomainName|null findOneBy(array $criteria, array $orderBy = null)
  * @method DomainName[]    findAll()
  * @method DomainName[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class DomainNameRepository extends ServiceEntityRepository
+class DomainNameRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -39,11 +39,15 @@ class DomainNameRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllWithPagination($page, $limit)
+    public function search($keyword)
     {
-        $qb = $this->createQueryBuilder('d')
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
+        $qb = $this
+            ->createQueryBuilder('v')
+            ->select('v')            
+            ->andWhere('v.name like :keyword')
+            ->setParameter('keyword', '%'. $keyword .'%')
+            ->orderBy('v.name', 'asc');
+
         return $qb->getQuery()->getResult();
     }
 

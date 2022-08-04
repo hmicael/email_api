@@ -103,6 +103,48 @@ class VirtualForwardController extends AbstractFOSRestController
         return new JsonResponse($virtualForwards, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
+    /** 
+     * @Rest\Post(
+     *      "/virtual-forwards/search",
+     *      name="virtual_forward_search"
+     * )
+     * @OA\Response(
+     *      response=200,
+     *      description="Return list of virtual forwards according to research",
+     *      @OA\JsonContent(
+     *         type="array",
+     *         @OA\Items(ref=@Model(type=VirtualUser::class))
+     *      )
+     * )
+     * @OA\Tag(name="VirtualUser")   
+     * @Rest\View(StatusCode=200)
+     * @param Request $request
+     * @param VirtualForwardRepository $virtualForwadRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+    */
+    public function search(
+        Request $request,
+        VirtualForwardRepository $virtualForwadRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $content = $request->toArray();
+        $keyword = htmlspecialchars($content["keyword"]) ?? "";
+        $domainId = (int)($content["domainId"]) ?? -1;
+        $data = $virtualForwadRepository->search($domainId, $keyword);
+
+        return new JsonResponse(
+            $serializer->serialize(
+                $data,
+                'json',
+                SerializationContext::create()->setGroups(array('list', 'getDomainNames'))
+            ),
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            true
+        );
+    }
+
     /**
      * @Rest\Get(
      *      "/virtual-forwards/{id}",

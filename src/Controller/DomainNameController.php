@@ -22,6 +22,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/api")
@@ -97,6 +98,47 @@ class DomainNameController extends AbstractFOSRestController
         });
 
         return new JsonResponse($domainNames, Response::HTTP_OK, ['accept' => 'json'], true);
+    }
+
+    /** 
+     * @Rest\Post(
+     *      "/domain-names/search",
+     *      name="domain_name_search"
+     * )
+     * @OA\Response(
+     *      response=200,
+     *      description="Return list of domain name according to research",
+     *      @OA\JsonContent(
+     *         type="array",
+     *         @OA\Items(ref=@Model(type=DomainName::class))
+     *      )
+     * )
+     * @OA\Tag(name="DomainName")   
+     * @Rest\View(StatusCode=200)
+     * @param Request $request
+     * @param DomainNameRepository $domainNameRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+    */
+    public function search(
+        Request $request,
+        DomainNameRepository $domainNameRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $content = $request->toArray();
+        $keyword = htmlspecialchars($content["keyword"]) ?? "";
+        $data = $domainNameRepository->search($keyword);
+
+        return new JsonResponse(
+            $serializer->serialize(
+                $data,
+                'json',
+                SerializationContext::create()->setGroups(array('list'))
+            ),
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            true
+        );
     }
 
     /**

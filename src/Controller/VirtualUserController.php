@@ -34,7 +34,7 @@ class VirtualUserController extends AbstractFOSRestController
 {
     /**
      * @Rest\Get(
-     *      "/virtual-users"),
+     *      "/virtual-users",
      *      name="virtual_user_list"
      * )
      * @QueryParam(
@@ -99,6 +99,48 @@ class VirtualUserController extends AbstractFOSRestController
         });
 
         return new JsonResponse($virtualUsers, Response::HTTP_OK, ['accept' => 'json'], true);
+    }
+
+    /** 
+     * @Rest\Post(
+     *      "/virtual-users/search",
+     *      name="virtual_user_search"
+     * )
+     * @OA\Response(
+     *      response=200,
+     *      description="Return list of virtual users according to research",
+     *      @OA\JsonContent(
+     *         type="array",
+     *         @OA\Items(ref=@Model(type=VirtualUser::class))
+     *      )
+     * )
+     * @OA\Tag(name="VirtualUser")   
+     * @Rest\View(StatusCode=200)
+     * @param Request $request
+     * @param VirtualUserRepository $virtualUserRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+    */
+    public function search(
+        Request $request,
+        VirtualUserRepository $virtualUserRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $content = $request->toArray();
+        $keyword = htmlspecialchars($content["keyword"]) ?? "";
+        $domainId = (int)($content["domainId"]) ?? -1;
+        $data = $virtualUserRepository->search($domainId, $keyword);
+
+        return new JsonResponse(
+            $serializer->serialize(
+                $data,
+                'json',
+                SerializationContext::create()->setGroups(array('list', 'getDomainNames'))
+            ),
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            true
+        );
     }
 
     /**

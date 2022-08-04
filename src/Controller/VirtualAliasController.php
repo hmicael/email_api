@@ -136,6 +136,48 @@ class VirtualAliasController extends AbstractFOSRestController
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
+    /** 
+     * @Rest\Post(
+     *      "/virtual-aliases/search",
+     *      name="virtual_alias_search"
+     * )
+     * @OA\Response(
+     *      response=200,
+     *      description="Return list of virtual aliases according to research",
+     *      @OA\JsonContent(
+     *         type="array",
+     *         @OA\Items(ref=@Model(type=VirtualUser::class))
+     *      )
+     * )
+     * @OA\Tag(name="VirtualUser")   
+     * @Rest\View(StatusCode=200)
+     * @param Request $request
+     * @param VirtualAliasRepository $virtualAliasRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+    */
+    public function search(
+        Request $request,
+        VirtualAliasRepository $virtualAliasRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $content = $request->toArray();
+        $keyword = htmlspecialchars($content["keyword"]) ?? "";
+        $domainId = (int)($content["domainId"]) ?? -1;
+        $data = $virtualAliasRepository->search($domainId, $keyword);
+
+        return new JsonResponse(
+            $serializer->serialize(
+                $data,
+                'json',
+                SerializationContext::create()->setGroups(array('list', 'getDomainNames'))
+            ),
+            Response::HTTP_OK,
+            ['accept' => 'json'],
+            true
+        );
+    }
+
     /**
      * @Rest\Post(
      *      path="/virtual-aliases",
