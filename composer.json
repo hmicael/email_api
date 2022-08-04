@@ -27,6 +27,7 @@
         "symfony/expression-language": "5.4.*",
         "symfony/flex": "^1.17|^2",
         "symfony/framework-bundle": "*",
+        "symfony/mailer": "5.4.*",
         "symfony/password-hasher": "5.4.*",
         "symfony/property-access": "5.4.*",
         "symfony/property-info": "5.4.*",

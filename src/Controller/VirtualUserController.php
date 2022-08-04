@@ -24,7 +24,10 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use App\Service\Tools;
+use ProxyManager\Factory\RemoteObject\Adapter\JsonRpc;
 
 /**
  * @Route("/api")
@@ -204,59 +207,59 @@ class VirtualUserController extends AbstractFOSRestController
         ValidatorInterface $validator,
         DomainNameRepository $domainNameRepository
         ): JsonResponse {
-            $cachePool->invalidateTags(["virtualUserCache"]);
-            $virtualUser = $serializer->deserialize($request->getContent(), VirtualUser::class, 'json');
-                        
-            $content = $request->toArray();
-            // just to validate the length and format of the password because it's excluded
-            if (array_key_exists("password", $content)) {
-                $virtualUser->setPassword($content["password"]); 
-            }
-            $errors = $validator->validate($virtualUser);
-            if (count($errors) > 0 || ! $content['idDomainName']) {
-                return new JsonResponse(
-                    $serializer->serialize($errors, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
-                    [],
-                    true
-                );
-            }
-            
-            if (array_key_exists("password", $content)) {
-                $virtualUser->setPassword(password_hash($content["password"], PASSWORD_DEFAULT));
-            }
-            $domainName = $domainNameRepository->find($content['idDomainName']);
-            if(! $domainName) {
-                $errors = ["message" => "Domain id " . $content['idDomainName'] . " doesn't exist"];
-                return new JsonResponse(
-                    $serializer->serialize($errors, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
-                    [],
-                    true
-                );
-            }
-            $virtualUser->setDomainName($domainName);
-            $virtualUser->setMaildir($domainName->getName() . "/" . explode("@", $virtualUser->getEmail())[0] . "/");
-
-            // force email to use correct domain name in case of error    
-            $email = preg_replace('#^(.+)@(.+)$#', '$1@' . $domainName->getName(), $virtualUser->getEmail());
-            $virtualUser->setEmail($email);
-            
-            $em->persist($virtualUser);
-            $em->flush();
-            
-            $jsonVirtualUser = $serializer->serialize(
-                $virtualUser,
-                'json',
-                SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getAliases', "getForwards"))
+        $cachePool->invalidateTags(["virtualUserCache"]);
+        $virtualUser = $serializer->deserialize($request->getContent(), VirtualUser::class, 'json');
+                    
+        $content = $request->toArray();
+        // just to validate the length and format of the password because it's excluded
+        if (array_key_exists("password", $content)) {
+            $virtualUser->setPassword($content["password"]); 
+        }
+        $errors = $validator->validate($virtualUser);
+        if (count($errors) > 0 || ! $content['idDomainName']) {
+            return new JsonResponse(
+                $serializer->serialize($errors, 'json'),
+                JsonResponse::HTTP_BAD_REQUEST,
+                [],
+                true
             );
-            $location = $urlGenerator->generate(
-                'virtual_user_show',
-                ['id' => $virtualUser->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ); 
-            
-            return new JsonResponse($jsonVirtualUser, Response::HTTP_CREATED, ["Location" => $location], true);
+        }
+        
+        if (array_key_exists("password", $content)) {
+            $virtualUser->setPassword(password_hash($content["password"], PASSWORD_DEFAULT));
+        }
+        $domainName = $domainNameRepository->find($content['idDomainName']);
+        if(! $domainName) {
+            $errors = ["message" => "Domain id " . $content['idDomainName'] . " doesn't exist"];
+            return new JsonResponse(
+                $serializer->serialize($errors, 'json'),
+                JsonResponse::HTTP_BAD_REQUEST,
+                [],
+                true
+            );
+        }
+        $virtualUser->setDomainName($domainName);
+        $virtualUser->setMaildir($domainName->getName() . "/" . explode("@", $virtualUser->getEmail())[0] . "/");
+
+        // force email to use correct domain name in case of error    
+        $email = preg_replace('#^(.+)@(.+)$#', '$1@' . $domainName->getName(), $virtualUser->getEmail());
+        $virtualUser->setEmail($email);
+        
+        $em->persist($virtualUser);
+        $em->flush();
+        
+        $jsonVirtualUser = $serializer->serialize(
+            $virtualUser,
+            'json',
+            SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getAliases', "getForwards"))
+        );
+        $location = $urlGenerator->generate(
+            'virtual_user_show',
+            ['id' => $virtualUser->getId()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ); 
+        
+        return new JsonResponse($jsonVirtualUser, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
     /**
@@ -294,43 +297,79 @@ class VirtualUserController extends AbstractFOSRestController
         ValidatorInterface $validator,
         VirtualUser $virtualUser,
         DomainNameRepository $domainNameRepository
-        ): JsonResponse { 
-            $cachePool->invalidateTags(["virtualUserCache"]);
-            $content = $request->toArray();
-            // just to validate the length and format of the password because it's excluded
-            if (array_key_exists("password", $content)) {
-                $virtualUser->setPassword($content["password"]);
-            }
-            $errors = $validator->validate($virtualUser);
-            if (count($errors) > 0 || ! $content['idDomainName']) {
-                return new JsonResponse(
-                    $serializer->serialize($errors, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
-                    [],
-                    true
-                );
-            }
-            
-            if (array_key_exists("password", $content)) {
-                $virtualUser->setPassword(password_hash($content["password"], PASSWORD_DEFAULT));
-            }
-            $domainName = $domainNameRepository->find($content['idDomainName']);
-            if(! $domainName) {
-                $errors = ["message" => "Domain id " . $content['idDomainName'] . " doesn't exist"];
-                return new JsonResponse(
-                    $serializer->serialize($errors, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
-                    [],
-                    true
-                );
-            }
-            $virtualUser->setDomainName($domainName);
-                        
-            $em->persist($virtualUser);
-            $em->flush();
-
-            return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    ): JsonResponse { 
+        $cachePool->invalidateTags(["virtualUserCache"]);
+        $content = $request->toArray();
+        // just to validate the length and format of the password because it's excluded
+        if (array_key_exists("password", $content)) {
+            $virtualUser->setPassword($content["password"]);
         }
+        $errors = $validator->validate($virtualUser);
+        if (count($errors) > 0 || ! $content['idDomainName']) {
+            return new JsonResponse(
+                $serializer->serialize($errors, 'json'),
+                JsonResponse::HTTP_BAD_REQUEST,
+                [],
+                true
+            );
+        }
+        
+        if (array_key_exists("password", $content)) {
+            $virtualUser->setPassword(password_hash($content["password"], PASSWORD_DEFAULT));
+        }
+        $domainName = $domainNameRepository->find($content['idDomainName']);
+        if(! $domainName) {
+            $errors = ["message" => "Domain id " . $content['idDomainName'] . " doesn't exist"];
+            return new JsonResponse(
+                $serializer->serialize($errors, 'json'),
+                JsonResponse::HTTP_BAD_REQUEST,
+                [],
+                true
+            );
+        }
+        $virtualUser->setDomainName($domainName);
+                    
+        $em->persist($virtualUser);
+        $em->flush();
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
+    
+    /**
+     * @Rest\Patch(
+     *      "/virtual-users/{id}/reset-password",
+     *      name="virtual_user_reset_password",
+     *      requirements = {"id"="\d+"}
+     * )
+     * @OA\Response(
+     *      response=204,
+     *      description="Reset virtual user's password"
+     * )
+     * @OA\Parameter(
+     *      name="id",
+     *      in="query",
+     *      description="Id of the virtual user",
+     *      @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="VirtualUser")
+     * @Rest\View(StatusCode = 204)
+     * @param VirtualUser $virtualUser
+     * @param EntityManagerInterface $em
+     * @param Tools $tools
+     */
+    public function resetPassword(
+        VirtualUser $virtualUser,
+        EntityManagerInterface $em,
+        Tools $tools
+    ) : JsonResponse {
+        $newPassword = $tools->getRandomPassword();
+        $virtualUser->setPassword(password_hash($newPassword, PASSWORD_DEFAULT));
+
+        $em->persist($virtualUser);
+        $em->flush();
+        
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
 
     /**
      * @Rest\Delete(
@@ -359,10 +398,36 @@ class VirtualUserController extends AbstractFOSRestController
         EntityManagerInterface $em,
         TagAwareCacheInterface $cachePool
     ): JsonResponse {
-            $cachePool->invalidateTags(["virtualUserCache"]);
-            $em->remove($virtualUser);
-            $em->flush();
-            
-            return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        $cachePool->invalidateTags(["virtualUserCache"]);
+        $em->remove($virtualUser);
+        $em->flush();
+        
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Rest\Get(
+     *      "/email",
+     *      name="email"
+     * )
+     *
+     * @param MailerInterface $mailer
+     * @return JsonResponse
+     */
+    public function sendEmail(MailerInterface $mailer): JsonResponse
+    {
+        $email = (new Email())
+            ->to('handriamahadimby@ingenosya.mg')
+            //->cc('cc@example.com')
+            //->bcc('bcc@example.com')
+            //->replyTo('fabien@example.com')
+            //->priority(Email::PRIORITY_HIGH)
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->html('<p>See Twig integration for better HTML integration!</p>');
+
+        $mailer->send($email);
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 }
