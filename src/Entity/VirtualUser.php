@@ -79,6 +79,13 @@ class VirtualUser
     private $maildir;
 
     /**
+     * @ORM\Column(type="boolean")
+     * @Assert\Type("bool")
+     * @Groups({"list", "getVirtualUsers"})
+     */
+    private $active;
+
+    /**
      * @ORM\ManyToOne(targetEntity=DomainName::class, inversedBy="virtualUsers")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"getDomainNames"})
@@ -98,7 +105,7 @@ class VirtualUser
      * )
      */
     private $password;
-
+    
     /**
      * @ORM\ManyToMany(targetEntity=VirtualAlias::class, mappedBy="virtualUsers")
      * @Groups({"getAliases"})
@@ -110,11 +117,6 @@ class VirtualUser
      * @Groups({"getForwards"})
      */
     private $virtualForwards;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $active;
 
     public function __construct()
     {
