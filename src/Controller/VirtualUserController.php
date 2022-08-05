@@ -25,7 +25,7 @@ use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use App\Service\Tools;
 use ProxyManager\Factory\RemoteObject\Adapter\JsonRpc;
 
@@ -176,6 +176,7 @@ class VirtualUserController extends AbstractFOSRestController
             'json',
             SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getAliases', "getForwards"))
         );
+
         return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
@@ -197,6 +198,7 @@ class VirtualUserController extends AbstractFOSRestController
      * @param UrlGeneratorInterface $urlGenerator
      * @param TagAwareCacheInterface $cachePool
      * @param ValidatorInterface $validator
+     * @param MailerInterface $mailer
      */
     public function new(
         Request $request,
@@ -205,7 +207,8 @@ class VirtualUserController extends AbstractFOSRestController
         UrlGeneratorInterface $urlGenerator,
         TagAwareCacheInterface $cachePool,
         ValidatorInterface $validator,
-        DomainNameRepository $domainNameRepository
+        DomainNameRepository $domainNameRepository,
+        MailerInterface $mailer
         ): JsonResponse {
         $cachePool->invalidateTags(["virtualUserCache"]);
         $virtualUser = $serializer->deserialize($request->getContent(), VirtualUser::class, 'json');
@@ -247,6 +250,18 @@ class VirtualUserController extends AbstractFOSRestController
         
         $em->persist($virtualUser);
         $em->flush();
+
+        //sending email to admin and HR
+        $email = (new TemplatedEmail())
+            ->subject('New email account created !')
+            ->htmlTemplate('email/new_account.html.twig')
+            ->context([
+                'name' => $virtualUser->getName(),
+                'firstname' => $virtualUser->getFirstName(),
+                'user_email' => $virtualUser->getEmail(),
+                'password' => $content["password"]
+            ]);
+        $mailer->send($email);
         
         $jsonVirtualUser = $serializer->serialize(
             $virtualUser,
@@ -356,17 +371,31 @@ class VirtualUserController extends AbstractFOSRestController
      * @param VirtualUser $virtualUser
      * @param EntityManagerInterface $em
      * @param Tools $tools
+     * @param MailerInterface $mailer
      */
     public function resetPassword(
         VirtualUser $virtualUser,
         EntityManagerInterface $em,
-        Tools $tools
+        Tools $tools,
+        MailerInterface $mailer
     ) : JsonResponse {
         $newPassword = $tools->getRandomPassword();
         $virtualUser->setPassword(password_hash($newPassword, PASSWORD_DEFAULT));
 
         $em->persist($virtualUser);
         $em->flush();
+
+        //sending email to admin and HR
+        $email = (new TemplatedEmail())
+            ->subject('Password reseted !')
+            ->htmlTemplate('email/account_password_reset.html.twig')
+            ->context([
+                'name' => $virtualUser->getName(),
+                'firstname' => $virtualUser->getFirstName(),
+                'user_email' => $virtualUser->getEmail(),
+                'password' => $newPassword
+            ]);
+        $mailer->send($email);
         
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
@@ -403,31 +432,5 @@ class VirtualUserController extends AbstractFOSRestController
         $em->flush();
         
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * @Rest\Get(
-     *      "/email",
-     *      name="email"
-     * )
-     *
-     * @param MailerInterface $mailer
-     * @return JsonResponse
-     */
-    public function sendEmail(MailerInterface $mailer): JsonResponse
-    {
-        $email = (new Email())
-            ->to('handriamahadimby@ingenosya.mg')
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
-            ->subject('Time for Symfony Mailer!')
-            ->text('Sending emails is fun again!')
-            ->html('<p>See Twig integration for better HTML integration!</p>');
-
-        $mailer->send($email);
-
-        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 }

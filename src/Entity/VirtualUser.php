@@ -111,6 +111,11 @@ class VirtualUser
      */
     private $virtualForwards;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $active;
+
     public function __construct()
     {
         $this->virtualAliases = new ArrayCollection();
@@ -244,6 +249,18 @@ class VirtualUser
         if ($this->virtualForwards->removeElement($virtualForward)) {
             $virtualForward->removeVirtualUser($this);
         }
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
 
         return $this;
     }

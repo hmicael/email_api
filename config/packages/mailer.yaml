@@ -3,4 +3,8 @@ framework:
         dsn: '%env(MAILER_DSN)%'
         envelope:
             sender: 'mailer@ingenosya.mg'
-        #     recipients: ['handriamahadimby@ingenosya.mg']
+            recipients: ['handriamahadimby@ingenosya.mg']
+        headers:
+            From: 'mailer@ingenosya.mg'
+            To: 'handriamahadimby@ingenosya.mg'
+            Charset: 'utf-8'

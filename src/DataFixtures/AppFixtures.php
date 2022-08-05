@@ -58,6 +58,7 @@ class AppFixtures extends Fixture
             $users[$i]->setDomainName($domains[0]);
             $users[$i]->setMaildir("maildir-" . (int)($i+1));
             $users[$i]->setPassword("1698@Igy");
+            $users[$i]->setActive(true);
             $manager->persist($users[$i]);
         }
 
