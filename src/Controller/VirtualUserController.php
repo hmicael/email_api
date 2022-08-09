@@ -27,7 +27,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use App\Service\Tools;
-use ProxyManager\Factory\RemoteObject\Adapter\JsonRpc;
 
 /**
  * @Route("/api")
@@ -229,7 +228,7 @@ class VirtualUserController extends AbstractFOSRestController
             $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
-                JsonResponse::HTTP_BAD_REQUEST,
+                JsonResponse::HTTP_NOT_FOUND,
                 [],
                 true
             );
@@ -323,7 +322,7 @@ class VirtualUserController extends AbstractFOSRestController
             $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
-                JsonResponse::HTTP_BAD_REQUEST,
+                JsonResponse::HTTP_NOT_FOUND,
                 [],
                 true
             );

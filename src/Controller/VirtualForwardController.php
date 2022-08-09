@@ -36,7 +36,7 @@ class VirtualForwardController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
-     *      "/virtual-forwards"),
+     *      "/virtual-forwards",
      *      name="virtual_forward_list"
      * )
      * @QueryParam(
@@ -226,7 +226,7 @@ class VirtualForwardController extends AbstractFOSRestController
                 $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
+                    JsonResponse::HTTP_NOT_FOUND,
                     [],
                     true
                 );
@@ -306,7 +306,7 @@ class VirtualForwardController extends AbstractFOSRestController
                 $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
+                    JsonResponse::HTTP_NOT_FOUND,
                     [],
                     true
                 );

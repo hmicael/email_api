@@ -36,7 +36,7 @@ class VirtualAliasController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
-     *      "/virtual-aliases"),
+     *      "/virtual-aliases",
      *      name="virtual_alias_list"
      * )
      * @QueryParam(
@@ -226,7 +226,7 @@ class VirtualAliasController extends AbstractFOSRestController
                 $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
+                    JsonResponse::HTTP_NOT_FOUND,
                     [],
                     true
                 );
@@ -306,7 +306,7 @@ class VirtualAliasController extends AbstractFOSRestController
                 $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
+                    JsonResponse::HTTP_NOT_FOUND,
                     [],
                     true
                 );

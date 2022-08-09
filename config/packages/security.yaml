@@ -17,18 +17,21 @@ security:
         # main:
         #     lazy: true
         #     provider: app_user_provider
+        forgot_password:
+            pattern: ^/api/users/(forgot|reset)-password
+            stateless: true
         login:
             pattern: ^/api/login
             stateless: true
             json_login:
                 check_path: /api/login # or api_login_check as defined in config/routes.yaml
                 success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-        
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure  
         api:
             pattern:   ^/api
             stateless: true
             jwt: ~
+                    
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -40,6 +43,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/users/(forgot|reset)-password, roles: PUBLIC_ACCESS }
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/apip/, roles: IS_AUTHENTICATED_FULLY }

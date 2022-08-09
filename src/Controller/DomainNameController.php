@@ -33,7 +33,7 @@ class DomainNameController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
-     *      "/domain-names"),
+     *      "/domain-names",
      *      name="domain_name_list"
      * )
      * @QueryParam(
