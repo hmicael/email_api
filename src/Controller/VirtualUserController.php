@@ -3,30 +3,29 @@
 namespace App\Controller;
 
 use App\Entity\VirtualUser;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use App\Repository\VirtualUserRepository;
 use App\Repository\DomainNameRepository;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
-use JMS\Serializer\SerializerInterface;
-use JMS\Serializer\SerializationContext;
-use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use OpenApi\Annotations as OA;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use App\Repository\VirtualUserRepository;
 use App\Service\Tools;
+use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * @Route("/api")
@@ -35,6 +34,8 @@ use App\Service\Tools;
 class VirtualUserController extends AbstractFOSRestController
 {
     /**
+     * List all Virtual Users
+     * 
      * @Rest\Get(
      *      "/virtual-users",
      *      name="virtual_user_list"
@@ -71,13 +72,12 @@ class VirtualUserController extends AbstractFOSRestController
      *      description="Limit of result",
      *      @OA\Schema(type="int")
      * )
-     * @OA\Tag(name="VirtualUser")   
-     * @Rest\View(StatusCode=200)
+     * @OA\Tag(name="VirtualUser")
      * @param VirtualUserRepository $virtualUserRepository
      * @param SerializerInterface $serializer
      * @param TagAwareCacheInterface $cachePool
-     * @param $page
-     * @param $limit
+     * @param integer $page
+     * @param integer $limit
      * @return JsonResponse
      */
     public function list(
@@ -86,7 +86,8 @@ class VirtualUserController extends AbstractFOSRestController
         TagAwareCacheInterface $cachePool,
         $page = 1,
         $limit = 20
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $idCache = "listVirtualUsers" . $page . "-" . $limit;
         $virtualUsers = $cachePool->get(
             $idCache,
@@ -98,12 +99,14 @@ class VirtualUserController extends AbstractFOSRestController
                     'json',
                     SerializationContext::create()->setGroups(array('list', 'getDomainNames'))
                 );
-        });
+            });
 
         return new JsonResponse($virtualUsers, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
-    /** 
+    /**
+     * Return results of research
+     * 
      * @Rest\Post(
      *      "/virtual-users/search",
      *      name="virtual_user_search"
@@ -116,18 +119,18 @@ class VirtualUserController extends AbstractFOSRestController
      *         @OA\Items(ref=@Model(type=VirtualUser::class))
      *      )
      * )
-     * @OA\Tag(name="VirtualUser")   
-     * @Rest\View(StatusCode=200)
+     * @OA\Tag(name="VirtualUser")
      * @param Request $request
      * @param VirtualUserRepository $virtualUserRepository
      * @param SerializerInterface $serializer
      * @return JsonResponse
-    */
+     */
     public function search(
         Request $request,
         VirtualUserRepository $virtualUserRepository,
         SerializerInterface $serializer
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $content = $request->toArray();
         $keyword = htmlspecialchars($content["keyword"]) ?? "";
         $domainId = (int)($content["domainId"]) ?? -1;
@@ -146,6 +149,8 @@ class VirtualUserController extends AbstractFOSRestController
     }
 
     /**
+     * The Virutal User
+     * 
      * @Rest\Get(
      *      "/virtual-users/{id}",
      *      name="virtual_user_show",
@@ -162,13 +167,13 @@ class VirtualUserController extends AbstractFOSRestController
      *      description="Id of the virtual user",
      *      @OA\Schema(type="int")
      * )
-     * @OA\Tag(name="VirtualUser") 
+     * @OA\Tag(name="VirtualUser")
      * @Rest\View(StatusCode=200)
      * @param VirtualUser $virtualUser
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function show(VirtualUser $virtualUser, SerializerInterface $serializer) : JsonResponse
+    public function show(VirtualUser $virtualUser, SerializerInterface $serializer): JsonResponse
     {
         $data = $serializer->serialize(
             $virtualUser,
@@ -180,6 +185,8 @@ class VirtualUserController extends AbstractFOSRestController
     }
 
     /**
+     * Create Virtual User
+     * 
      * @Rest\Post(
      *      path="/virtual-users",
      *      name="virtual_user_new"
@@ -190,7 +197,6 @@ class VirtualUserController extends AbstractFOSRestController
      * )
      * @OA\RequestBody(@Model(type=VirtualUser::class))
      * @OA\Tag(name="VirtualUser")
-     * @Rest\View(StatusCode = 201)
      * @param Request $request
      * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
@@ -198,6 +204,7 @@ class VirtualUserController extends AbstractFOSRestController
      * @param TagAwareCacheInterface $cachePool
      * @param ValidatorInterface $validator
      * @param MailerInterface $mailer
+     * @return JsonResponse
      */
     public function new(
         Request $request,
@@ -208,13 +215,14 @@ class VirtualUserController extends AbstractFOSRestController
         ValidatorInterface $validator,
         DomainNameRepository $domainNameRepository,
         MailerInterface $mailer
-        ): JsonResponse {
+    ): JsonResponse
+    {
         $cachePool->invalidateTags(["virtualUserCache"]);
         $virtualUser = $serializer->deserialize($request->getContent(), VirtualUser::class, 'json');
-                    
+
         $content = $request->toArray();
         $errors = $validator->validate($virtualUser);
-        if (count($errors) > 0 || ! $content['domainNameId']) {
+        if (count($errors) > 0) {
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
                 JsonResponse::HTTP_BAD_REQUEST,
@@ -222,9 +230,9 @@ class VirtualUserController extends AbstractFOSRestController
                 true
             );
         }
-        
-        $domainName = $domainNameRepository->find($content['domainNameId']);
-        if(! $domainName) {
+
+        $domainName = $domainNameRepository->find($content['domainNameId'] ?? -1);
+        if (!$domainName) {
             $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
@@ -239,7 +247,7 @@ class VirtualUserController extends AbstractFOSRestController
         // force email to use correct domain name in case of error    
         $email = preg_replace('#^(.+)@(.+)$#', '$1@' . $domainName->getName(), $virtualUser->getEmail());
         $virtualUser->setEmail($email);
-        
+
         $em->persist($virtualUser);
         $em->flush();
 
@@ -254,7 +262,7 @@ class VirtualUserController extends AbstractFOSRestController
                 'password' => $content["password"]
             ]);
         $mailer->send($email);
-        
+
         $jsonVirtualUser = $serializer->serialize(
             $virtualUser,
             'json',
@@ -264,12 +272,14 @@ class VirtualUserController extends AbstractFOSRestController
             'virtual_user_show',
             ['id' => $virtualUser->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
-        ); 
-        
+        );
+
         return new JsonResponse($jsonVirtualUser, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
     /**
+     * Edit Virtual User
+     * 
      * @Rest\Put(
      *      path="/virtual-users/{id}",
      *      name="virtual_user_edit",
@@ -287,7 +297,6 @@ class VirtualUserController extends AbstractFOSRestController
      * )
      * @ParamConverter("virtualUser", converter="fos_rest.request_body")
      * @OA\Tag(name="VirtualUser")
-     * @Rest\View(StatusCode = 204)
      * @param Request $request
      * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
@@ -295,6 +304,7 @@ class VirtualUserController extends AbstractFOSRestController
      * @param ValidatorInterface $validator
      * @param VirtualUser $virtualUser
      * @param DomainNameRepository $domainNameRepository
+     * @return JsonResponse
      */
     public function edit(
         Request $request,
@@ -304,11 +314,12 @@ class VirtualUserController extends AbstractFOSRestController
         ValidatorInterface $validator,
         VirtualUser $virtualUser,
         DomainNameRepository $domainNameRepository
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $cachePool->invalidateTags(["virtualUserCache"]);
         $content = $request->toArray();
         $errors = $validator->validate($virtualUser);
-        if (count($errors) > 0 || ! $content['domainNameId']) {
+        if (count($errors) > 0) {
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
                 JsonResponse::HTTP_BAD_REQUEST,
@@ -316,9 +327,9 @@ class VirtualUserController extends AbstractFOSRestController
                 true
             );
         }
-        
-        $domainName = $domainNameRepository->find($content['domainNameId']);
-        if(! $domainName) {
+
+        $domainName = $domainNameRepository->find($content['domainNameId'] ?? -1);
+        if (!$domainName) {
             $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
@@ -328,14 +339,16 @@ class VirtualUserController extends AbstractFOSRestController
             );
         }
         $virtualUser->setDomainName($domainName);
-                    
+
         $em->persist($virtualUser);
         $em->flush();
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
-    
+
     /**
+     * Reset Virtual User's password
+     * 
      * @Rest\Patch(
      *      "/virtual-users/{id}/reset-password",
      *      name="virtual_user_reset_password",
@@ -352,18 +365,19 @@ class VirtualUserController extends AbstractFOSRestController
      *      @OA\Schema(type="int")
      * )
      * @OA\Tag(name="VirtualUser")
-     * @Rest\View(StatusCode = 204)
      * @param VirtualUser $virtualUser
      * @param EntityManagerInterface $em
      * @param Tools $tools
      * @param MailerInterface $mailer
+     * @return JsonResponse
      */
     public function resetPassword(
         VirtualUser $virtualUser,
         EntityManagerInterface $em,
         Tools $tools,
         MailerInterface $mailer
-    ) : JsonResponse {
+    ): JsonResponse
+    {
         $newPassword = $tools->getRandomPassword();
         $virtualUser->setPassword($newPassword);
 
@@ -381,11 +395,13 @@ class VirtualUserController extends AbstractFOSRestController
                 'password' => $newPassword
             ]);
         $mailer->send($email);
-        
+
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
     /**
+     * Delete Virtual User
+     * 
      * @Rest\Delete(
      *      "/virtual-users/{id}",
      *      name="virtual_user_delete",
@@ -402,20 +418,21 @@ class VirtualUserController extends AbstractFOSRestController
      *      @OA\Schema(type="int")
      * )
      * @OA\Tag(name="VirtualUser")
-     * @Rest\View(StatusCode=204)
      * @param VirtualUser $virtualUser
      * @param EntityManagerInterface $em
      * @param TagAwareCacheInterface $cachePool
+     * @return JsonResponse
      */
     public function delete(
         VirtualUser $virtualUser,
         EntityManagerInterface $em,
         TagAwareCacheInterface $cachePool
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $cachePool->invalidateTags(["virtualUserCache"]);
         $em->remove($virtualUser);
         $em->flush();
-        
+
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -3,26 +3,25 @@
 namespace App\Controller;
 
 use App\Entity\DomainName;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Repository\DomainNameRepository;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
-use JMS\Serializer\SerializerInterface;
-use JMS\Serializer\SerializationContext;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * @Route("/api")
@@ -32,6 +31,8 @@ class DomainNameController extends AbstractFOSRestController
 {
 
     /**
+     * Return list of Domain names
+     * 
      * @Rest\Get(
      *      "/domain-names",
      *      name="domain_name_list"
@@ -68,13 +69,13 @@ class DomainNameController extends AbstractFOSRestController
      *      description="Limit of result",
      *      @OA\Schema(type="int")
      * )
-     * @OA\Tag(name="DomainName")   
-     * @Rest\View(StatusCode=200)
+     * @OA\Tag(name="DomainName")
+     *
      * @param DomainNameRepository $domainNameRepository
      * @param SerializerInterface $serializer
      * @param TagAwareCacheInterface $cachePool
-     * @param $page
-     * @param $limit
+     * @param integer $page
+     * @param integer $limit
      * @return JsonResponse
      */
     public function list(
@@ -83,7 +84,8 @@ class DomainNameController extends AbstractFOSRestController
         TagAwareCacheInterface $cachePool,
         $page = 1,
         $limit = 20
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $idCache = "listDomaineNames" . $page . "-" . $limit;
         $domainNames = $cachePool->get(
             $idCache,
@@ -91,16 +93,18 @@ class DomainNameController extends AbstractFOSRestController
                 $item->tag("domaineNamesCache");
                 $data = $domainNameRepository->findAllWithPagination($page, $limit);
                 return $serializer->serialize(
-                    $data, 
+                    $data,
                     'json',
                     SerializationContext::create()->setGroups(array('list'))
                 );
-        });
+            });
 
         return new JsonResponse($domainNames, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
-    /** 
+    /**
+     * Return resulats of research
+     * 
      * @Rest\Post(
      *      "/domain-names/search",
      *      name="domain_name_search"
@@ -113,18 +117,19 @@ class DomainNameController extends AbstractFOSRestController
      *         @OA\Items(ref=@Model(type=DomainName::class))
      *      )
      * )
-     * @OA\Tag(name="DomainName")   
-     * @Rest\View(StatusCode=200)
+     * @OA\Tag(name="DomainName")
+     *
      * @param Request $request
      * @param DomainNameRepository $domainNameRepository
      * @param SerializerInterface $serializer
      * @return JsonResponse
-    */
+     */
     public function search(
         Request $request,
         DomainNameRepository $domainNameRepository,
         SerializerInterface $serializer
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $content = $request->toArray();
         $keyword = htmlspecialchars($content["keyword"]) ?? "";
         $data = $domainNameRepository->search($keyword);
@@ -142,6 +147,8 @@ class DomainNameController extends AbstractFOSRestController
     }
 
     /**
+     * Return the domain name
+     * 
      * @Rest\Get(
      *      "/domain-names/{id}",
      *      name="domain_name_show",
@@ -158,13 +165,13 @@ class DomainNameController extends AbstractFOSRestController
      *      description="Id of the domain name",
      *      @OA\Schema(type="int")
      * )
-     * @OA\Tag(name="DomainName") 
-     * @Rest\View(StatusCode=200)
+     * @OA\Tag(name="DomainName")
+     *
      * @param DomainName $domainName
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function show(DomainName $domainName, SerializerInterface $serializer) : JsonResponse
+    public function show(DomainName $domainName, SerializerInterface $serializer): JsonResponse
     {
         $data = $serializer->serialize(
             $domainName,
@@ -175,6 +182,8 @@ class DomainNameController extends AbstractFOSRestController
     }
 
     /**
+     * Create a domain name
+     * 
      * @Rest\Post(
      *      path="/domain-names",
      *      name="domain_name_new"
@@ -185,15 +194,16 @@ class DomainNameController extends AbstractFOSRestController
      * )
      * @OA\RequestBody(@Model(type=DomainName::class))
      * @OA\Tag(name="DomainName")
-     * @Rest\View(StatusCode = 201)
      * @ParamConverter("domainName", converter="fos_rest.request_body")
-     * @IsGranted("ROLE_ADMIN", message="Only admin can create domain name")
+     * @IsGranted("ROLE_ADMIN", message="Only admin can create a domain name")
+     * 
      * @param DomainName $domainName
      * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
      * @param UrlGeneratorInterface $urlGenerator
      * @param ConstraintViolationList $violations
      * @param TagAwareCacheInterface $cachePool
+     * @return JsonResponse
      */
     public function new(
         DomainName $domainName,
@@ -202,35 +212,38 @@ class DomainNameController extends AbstractFOSRestController
         UrlGeneratorInterface $urlGenerator,
         ConstraintViolationList $violations,
         TagAwareCacheInterface $cachePool
-        ): JsonResponse {
-            $cachePool->invalidateTags(["domaineNamesCache"]);
-            if (count($violations)) {
-                return new JsonResponse(
-                    $serializer->serialize($violations, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
-                    [],
-                    true
-                );
-            }
-
-            $em->persist($domainName);
-            $em->flush();
-
-            $jsonDomainName = $serializer->serialize(
-                $domainName,
-                'json',
-                SerializationContext::create()->setGroups(array('list', 'showDomainName'))
+    ): JsonResponse
+    {
+        $cachePool->invalidateTags(["domaineNamesCache"]);
+        if (count($violations)) {
+            return new JsonResponse(
+                $serializer->serialize($violations, 'json'),
+                JsonResponse::HTTP_BAD_REQUEST,
+                [],
+                true
             );
-            $location = $urlGenerator->generate(
-                'domain_name_show',
-                ['id' => $domainName->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ); 
-            
-            return new JsonResponse($jsonDomainName, Response::HTTP_CREATED, ["Location" => $location], true);
+        }
+
+        $em->persist($domainName);
+        $em->flush();
+
+        $jsonDomainName = $serializer->serialize(
+            $domainName,
+            'json',
+            SerializationContext::create()->setGroups(array('list', 'showDomainName'))
+        );
+        $location = $urlGenerator->generate(
+            'domain_name_show',
+            ['id' => $domainName->getId()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        return new JsonResponse($jsonDomainName, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
     /**
+     * Edit a Domain name
+     * 
      * @Rest\Put(
      *      path="/domain-names/{id}",
      *      name="domain_name_edit",
@@ -247,14 +260,15 @@ class DomainNameController extends AbstractFOSRestController
      *      @OA\Schema(type="int")
      * )
      * @OA\Tag(name="DomainName")
-     * @Rest\View(StatusCode = 204)
      * @ParamConverter("domainName", converter="fos_rest.request_body")
-     * @IsGranted("ROLE_ADMIN", message="Only admin can edit domain name")
+     * @IsGranted("ROLE_ADMIN", message="Only admin can edit a domain name")
+     *
      * @param SerializerInterface $serializer
      * @param EntityManagerInterface $em
      * @param DomainName $domainName
      * @param ConstraintViolationList $violations
      * @param TagAwareCacheInterface $cachePool
+     * @return JsonResponse
      */
     public function edit(
         SerializerInterface $serializer,
@@ -262,24 +276,27 @@ class DomainNameController extends AbstractFOSRestController
         DomainName $domainName,
         ConstraintViolationList $violations,
         TagAwareCacheInterface $cachePool
-        ): JsonResponse { 
-            $cachePool->invalidateTags(["domaineNamesCache"]);
-            if (count($violations)) {
-                return new JsonResponse(
-                    $serializer->serialize($violations, 'json'),
-                    JsonResponse::HTTP_BAD_REQUEST,
-                    [],
-                    true
-                );
-            }
-
-            $em->persist($domainName);
-            $em->flush();
-
-            return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    ): JsonResponse
+    {
+        $cachePool->invalidateTags(["domaineNamesCache"]);
+        if (count($violations)) {
+            return new JsonResponse(
+                $serializer->serialize($violations, 'json'),
+                JsonResponse::HTTP_BAD_REQUEST,
+                [],
+                true
+            );
         }
 
+        $em->persist($domainName);
+        $em->flush();
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
+
     /**
+     * Delete a domain name
+     * 
      * @Rest\Delete(
      *      "/domain-names/{id}",
      *      name="domain_name_delete",
@@ -296,21 +313,23 @@ class DomainNameController extends AbstractFOSRestController
      *      @OA\Schema(type="int")
      * )
      * @OA\Tag(name="DomainName")
-     * @Rest\View(StatusCode=204)
-     * @IsGranted("ROLE_ADMIN", message="Only admin can delete domain name")
+     * @IsGranted("ROLE_ADMIN", message="Only admin can delete a domain name")
+     *
      * @param DomainName $domainName
      * @param EntityManagerInterface $em
      * @param TagAwareCacheInterface $cachePool
+     * @return JsonResponse
      */
     public function delete(
         DomainName $domainName,
         EntityManagerInterface $em,
         TagAwareCacheInterface $cachePool
-    ): JsonResponse {
-            $cachePool->invalidateTags(["domaineNamesCache"]);
-            $em->remove($domainName);
-            $em->flush();
-            
-            return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    ): JsonResponse
+    {
+        $cachePool->invalidateTags(["domaineNamesCache"]);
+        $em->remove($domainName);
+        $em->flush();
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

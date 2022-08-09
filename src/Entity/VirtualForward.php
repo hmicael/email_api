@@ -6,10 +6,10 @@ use App\Repository\VirtualForwardRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use JMS\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=VirtualForwardRepository::class)
@@ -21,7 +21,7 @@ use JMS\Serializer\Annotation\Groups;
  *          parameters = { "id" = "expr(object.getId())" }
  *      )
  * )
- * 
+ *
  * @Hateoas\Relation(
  *      "delete",
  *      href = @Hateoas\Route(

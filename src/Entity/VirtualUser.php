@@ -6,10 +6,10 @@ use App\Repository\VirtualUserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Hateoas\Configuration\Annotation as Hateoas;
-use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=VirtualUserRepository::class)
@@ -21,7 +21,7 @@ use JMS\Serializer\Annotation\Groups;
  *          parameters = { "id" = "expr(object.getId())" }
  *      )
  * )
- * 
+ *
  * @Hateoas\Relation(
  *      "delete",
  *      href = @Hateoas\Route(
@@ -105,7 +105,7 @@ class VirtualUser
      * )
      */
     private $password;
-    
+
     /**
      * @ORM\ManyToMany(targetEntity=VirtualAlias::class, mappedBy="virtualUsers")
      * @Groups({"getAliases"})

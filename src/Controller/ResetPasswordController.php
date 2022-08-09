@@ -2,28 +2,25 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use JMS\Serializer\SerializerInterface;
+use OpenApi\Annotations as OA;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use OpenApi\Annotations as OA;
-use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use App\Repository\UserRepository;
-use JMS\Serializer\SerializerInterface;
 
 /**
  * @Route("/api")
@@ -72,7 +69,8 @@ class ResetPasswordController extends AbstractFOSRestController
         ValidatorInterface $validator,
         MailerInterface $mailer,
         string $token = null
-    ): JsonResponse {
+    ): JsonResponse
+    {
         if (null === $token) {
             throw $this->createNotFoundException('No reset password token found in the URL');
         }
@@ -107,11 +105,11 @@ class ResetPasswordController extends AbstractFOSRestController
         $encodedPassword = $userPasswordHasher->hashPassword(
             $user,
             $plainPassowrd
-        );    
+        );
         $user->setPassword($encodedPassword);
-        
+
         $this->entityManager->flush();
-        
+
         // A password reset token should be used only once, remove it.
         $this->resetPasswordHelper->removeResetRequest($token);
 
@@ -120,7 +118,7 @@ class ResetPasswordController extends AbstractFOSRestController
 
     /**
      * Send reset password email
-     * 
+     *
      * @Rest\Post(
      *      "/users/forgot-password",
      *      name="user_forgot_password"
@@ -145,7 +143,8 @@ class ResetPasswordController extends AbstractFOSRestController
         SerializerInterface $serializer,
         ValidatorInterface $validator,
         MailerInterface $mailer
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $content = $request->toArray();
         $email = $content['email'] ?? "";
         $emailConstraint = new EmailConstraint();
@@ -160,7 +159,7 @@ class ResetPasswordController extends AbstractFOSRestController
         }
 
         $user = $userRepository->findOneByEmail($email);
-        if(! $user) {
+        if (!$user) {
             $errors = ["message" => "Email " . $content['email'] . " doesn't exist"];
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
@@ -168,7 +167,7 @@ class ResetPasswordController extends AbstractFOSRestController
                 [],
                 true
             );
-        }   
+        }
 
         try {
             $resetToken = $this->resetPasswordHelper->generateResetToken($user);
@@ -199,8 +198,7 @@ class ResetPasswordController extends AbstractFOSRestController
             ->htmlTemplate('reset_password/email.html.twig')
             ->context([
                 'resetToken' => $resetToken,
-            ])
-        ;
+            ]);
         $mailer->send($email);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
