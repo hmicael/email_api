@@ -212,7 +212,7 @@ class VirtualForwardController extends AbstractFOSRestController
             $content = $request->toArray();
 
             $errors = $validator->validate($virtualForward);
-            if (count($errors) > 0 || ! $content['idDomainName']) {
+            if (count($errors) > 0 || ! $content['domainNameId']) {
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,
@@ -221,9 +221,9 @@ class VirtualForwardController extends AbstractFOSRestController
                 );
             }
 
-            $domainName = $domainNameRepository->find($content['idDomainName']);
+            $domainName = $domainNameRepository->find($content['domainNameId']);
             if(! $domainName) {
-                $errors = ["message" => "Domain id " . $content['idDomainName'] . " doesn't exist"];
+                $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,
@@ -292,7 +292,7 @@ class VirtualForwardController extends AbstractFOSRestController
             $cachePool->invalidateTags(["virtualForwardsCache"]);
             $content = $request->toArray();
             $errors = $validator->validate($virtualForward);
-            if (count($errors) > 0 || ! $content['idDomainName']) {
+            if (count($errors) > 0 || ! $content['domainNameId']) {
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,
@@ -301,9 +301,9 @@ class VirtualForwardController extends AbstractFOSRestController
                 );
             }
 
-            $domainName = $domainNameRepository->find($content['idDomainName']);
+            $domainName = $domainNameRepository->find($content['domainNameId']);
             if(! $domainName) {
-                $errors = ["message" => "Domain id " . $content['idDomainName'] . " doesn't exist"];
+                $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
                 return new JsonResponse(
                     $serializer->serialize($errors, 'json'),
                     JsonResponse::HTTP_BAD_REQUEST,

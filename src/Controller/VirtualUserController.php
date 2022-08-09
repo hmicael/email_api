@@ -214,12 +214,8 @@ class VirtualUserController extends AbstractFOSRestController
         $virtualUser = $serializer->deserialize($request->getContent(), VirtualUser::class, 'json');
                     
         $content = $request->toArray();
-        // just to validate the length and format of the password because it's excluded
-        if (array_key_exists("password", $content)) {
-            $virtualUser->setPassword($content["password"]); 
-        }
         $errors = $validator->validate($virtualUser);
-        if (count($errors) > 0 || ! $content['idDomainName']) {
+        if (count($errors) > 0 || ! $content['domainNameId']) {
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
                 JsonResponse::HTTP_BAD_REQUEST,
@@ -228,12 +224,9 @@ class VirtualUserController extends AbstractFOSRestController
             );
         }
         
-        if (array_key_exists("password", $content)) {
-            $virtualUser->setPassword(password_hash($content["password"], PASSWORD_DEFAULT));
-        }
-        $domainName = $domainNameRepository->find($content['idDomainName']);
+        $domainName = $domainNameRepository->find($content['domainNameId']);
         if(! $domainName) {
-            $errors = ["message" => "Domain id " . $content['idDomainName'] . " doesn't exist"];
+            $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
                 JsonResponse::HTTP_BAD_REQUEST,
@@ -312,15 +305,11 @@ class VirtualUserController extends AbstractFOSRestController
         ValidatorInterface $validator,
         VirtualUser $virtualUser,
         DomainNameRepository $domainNameRepository
-    ): JsonResponse { 
+    ): JsonResponse {
         $cachePool->invalidateTags(["virtualUserCache"]);
         $content = $request->toArray();
-        // just to validate the length and format of the password because it's excluded
-        if (array_key_exists("password", $content)) {
-            $virtualUser->setPassword($content["password"]);
-        }
         $errors = $validator->validate($virtualUser);
-        if (count($errors) > 0 || ! $content['idDomainName']) {
+        if (count($errors) > 0 || ! $content['domainNameId']) {
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
                 JsonResponse::HTTP_BAD_REQUEST,
@@ -329,12 +318,9 @@ class VirtualUserController extends AbstractFOSRestController
             );
         }
         
-        if (array_key_exists("password", $content)) {
-            $virtualUser->setPassword(password_hash($content["password"], PASSWORD_DEFAULT));
-        }
-        $domainName = $domainNameRepository->find($content['idDomainName']);
+        $domainName = $domainNameRepository->find($content['domainNameId']);
         if(! $domainName) {
-            $errors = ["message" => "Domain id " . $content['idDomainName'] . " doesn't exist"];
+            $errors = ["message" => "Domain id " . $content['domainNameId'] . " doesn't exist"];
             return new JsonResponse(
                 $serializer->serialize($errors, 'json'),
                 JsonResponse::HTTP_BAD_REQUEST,
@@ -380,7 +366,7 @@ class VirtualUserController extends AbstractFOSRestController
         MailerInterface $mailer
     ) : JsonResponse {
         $newPassword = $tools->getRandomPassword();
-        $virtualUser->setPassword(password_hash($newPassword, PASSWORD_DEFAULT));
+        $virtualUser->setPassword($newPassword);
 
         $em->persist($virtualUser);
         $em->flush();
