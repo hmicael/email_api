@@ -24,13 +24,6 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 
 /**
  * @Route("/api")
@@ -338,100 +331,5 @@ class UserController extends AbstractFOSRestController
             $em->flush();
             
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * @Rest\Post(
-     *      "/users/forgot-password",
-     *      name="user_forgot_password"
-     * )
-     * @OA\Response(
-     *      response=204,
-     *      description="Request a reset password"
-     * )
-     * @OA\Tag(name="User")
-     * @Rest\View(StatusCode = 204)
-     * @param Request $request
-     * @param UserRepository $userRepository
-     * @param MailerInterface $mailer
-     * @param JWTTokenManagerInterface $JWTManager
-     * @param SerializerInterface $serializer
-     * @param UrlGeneratorInterface $urlGeneratorInterface
-     */
-    public function forgotPassword(
-        Request $request,
-        UserRepository $userRepository,
-        MailerInterface $mailer,
-        JWTTokenManagerInterface $JWTManager,
-        ValidatorInterface $validator,
-        SerializerInterface $serializer,
-        UrlGeneratorInterface $urlGeneratorInterface
-    ): JsonResponse
-    {
-        $content = $request->toArray();
-        $email = $content['email'] ?? "";
-        $emailConstraint = new EmailConstraint();
-        $errors = $validator->validateProperty($emailConstraint, $email);
-        if (count($errors) > 0) {
-            return new JsonResponse(
-                $serializer->serialize($errors, 'json'),
-                JsonResponse::HTTP_BAD_REQUEST,
-                [],
-                true
-            );
-        }
-
-        $user = $userRepository->findOneByEmail($email);
-        if(! $user) {
-            $errors = ["message" => "Email " . $content['email'] . " doesn't exist"];
-            return new JsonResponse(
-                $serializer->serialize($errors, 'json'),
-                JsonResponse::HTTP_NOT_FOUND,
-                [],
-                true
-            );
-        }
-
-        $url = $urlGeneratorInterface->generate(
-            'user_reset_password',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-
-        //sending email to user
-        $email = (new TemplatedEmail())
-            ->subject('Password reseted !')
-            ->htmlTemplate('email/forgot_password.html.twig')
-            ->context([
-                'name' => $user->getName(),
-                'firstname' => $user->getFirstName(),
-                'user_email' => $user->getEmail(),
-                'token' => $JWTManager->create($user),
-                'url' => $url
-            ]);
-        $mailer->send($email);
-
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * @Rest\Get(
-     *      "/users/reset-password",
-     *      name="user_reset_password"
-     * )
-     * @OA\Response(
-     *      response=204,
-     *      description="Password Reseted"
-     * )
-     * @OA\Tag(name="User")
-     * @Rest\View(StatusCode = 204)
-     * @param JWTTokenManagerInterface $JWTManager
-     */
-    public function resetPassword(
-        TokenStorageInterface $tokenStorageInterface,
-        JWTTokenManagerInterface $JWTManager
-    ): JsonResponse {
-        $token = $JWTManager->decode($tokenStorageInterface->getToken());
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
