@@ -58,7 +58,6 @@ class ResetPasswordController extends AbstractFOSRestController
      *      description="Reset a reset password"
      * )
      * @OA\Tag(name="User")
-     * @Rest\View(StatusCode = 204)
      *
      * @param Request $request
      * @param UserPasswordHasherInterface $userPasswordHasher
@@ -141,7 +140,6 @@ class ResetPasswordController extends AbstractFOSRestController
      *      description="Request a reset password"
      * )
      * @OA\Tag(name="User")
-     * @Rest\View(StatusCode = 204)
      *
      * @param Request $request
      * @param UserRepository $userRepository

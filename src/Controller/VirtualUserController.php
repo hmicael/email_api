@@ -168,7 +168,6 @@ class VirtualUserController extends AbstractFOSRestController
      *      @OA\Schema(type="int")
      * )
      * @OA\Tag(name="VirtualUser")
-     * @Rest\View(StatusCode=200)
      * @param VirtualUser $virtualUser
      * @param SerializerInterface $serializer
      * @return JsonResponse

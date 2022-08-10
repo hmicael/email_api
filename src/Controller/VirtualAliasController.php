@@ -425,7 +425,6 @@ class VirtualAliasController extends AbstractFOSRestController
      *      description="Dettach user from alias"
      * )
      * @OA\Tag(name="VirtualAlias")
-     * @Rest\View(StatusCode=204)
      * @param VirtualAlias $virtualAlias
      * @param VirtualUser $virtualUser
      * @param EntityManagerInterface $em
