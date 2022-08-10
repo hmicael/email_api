@@ -49,7 +49,7 @@ class ResetPasswordController extends AbstractFOSRestController
      *      name="user_reset_password"
      * )
      * @OA\RequestBody(
-     *      description="Email whose password is to be reseted",
+     *      description="New plain password",
      *      required=True,
      *      @Model(type=User::class, groups={"reset"})
      * )
@@ -95,7 +95,7 @@ class ResetPasswordController extends AbstractFOSRestController
         }
 
         $content = $request->toArray();
-        $plainPassowrd = $content['plainPassword'] ?? "";
+        $plainPassowrd = $content['password'] ?? "";
         $user->setPassword($plainPassowrd);
 
         // Check if the password is valid
