@@ -208,7 +208,7 @@ class ResetPasswordController extends AbstractFOSRestController
             // ->to($user->getEmail())
             ->to('handriamahadimby@ingenosya.mg')
             ->subject('Your password reset request')
-            ->htmlTemplate('reset_password/email.html.twig')
+            ->htmlTemplate('email/reset_password.html.twig')
             ->context([
                 'resetToken' => $resetToken,
             ]);
