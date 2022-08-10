@@ -57,7 +57,7 @@ class VirtualUserController extends AbstractFOSRestController
      *      description="Return list of virtual users",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=VirtualUser::class))
+     *         @OA\Items(ref=@Model(type=VirtualUser::class, groups={"list", "getDomainNames"}))
      *      )
      * )
      * @OA\Parameter(
@@ -116,7 +116,7 @@ class VirtualUserController extends AbstractFOSRestController
      *      description="Return list of virtual users according to research",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=VirtualUser::class))
+     *         @OA\Items(ref=@Model(type=VirtualUser::class, groups={"list", "getDomainNames"}))
      *      )
      * )
      * @OA\Tag(name="VirtualUser")
@@ -159,7 +159,7 @@ class VirtualUserController extends AbstractFOSRestController
      * @OA\Response(
      *      response=200,
      *      description="Return detail of virtual user",
-     *      @OA\Schema(type=VirtualUser::class)
+     *      @Model(type=VirtualUser::class, groups={"list", "getDomainNames", "getAliases", "getForwards"})
      * )
      * @OA\Parameter(
      *      name="id",

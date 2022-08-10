@@ -54,7 +54,7 @@ class DomainNameController extends AbstractFOSRestController
      *      description="Return list of domain names",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=DomainName::class))
+     *         @OA\Items(ref=@Model(type=DomainName::class, groups={"list"}))
      *      )
      * )
      * @OA\Parameter(
@@ -114,7 +114,7 @@ class DomainNameController extends AbstractFOSRestController
      *      description="Return list of domain name according to research",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=DomainName::class))
+     *         @OA\Items(ref=@Model(type=DomainName::class, groups={"list"}))
      *      )
      * )
      * @OA\Tag(name="DomainName")
@@ -157,7 +157,7 @@ class DomainNameController extends AbstractFOSRestController
      * @OA\Response(
      *      response=200,
      *      description="Return detail of domain name",
-     *      @OA\Schema(type=DomainName::class)
+     *      @Model(type=DomainName::class, groups={"list", "showDomainName"})
      * )
      * @OA\Parameter(
      *      name="id",

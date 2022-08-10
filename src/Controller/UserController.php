@@ -54,7 +54,7 @@ class UserController extends AbstractFOSRestController
      *      description="Return list of users",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=User::class))
+     *         @OA\Items(ref=@Model(type=User::class, groups={"list"}))
      *      )
      * )
      * @OA\Parameter(
@@ -114,7 +114,7 @@ class UserController extends AbstractFOSRestController
      *      description="Return list of user according to research",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=User::class))
+     *         @OA\Items(ref=@Model(type=User::class, groups={"list"}))
      *      )
      * )
      * @OA\Tag(name="User")
@@ -157,7 +157,7 @@ class UserController extends AbstractFOSRestController
      * @OA\Response(
      *      response=200,
      *      description="Return detail of user",
-     *      @OA\Schema(type=User::class)
+     *      @Model(type=User::class, groups={"list"})
      * )
      * @OA\Parameter(
      *      name="id",

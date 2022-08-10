@@ -57,7 +57,7 @@ class VirtualAliasController extends AbstractFOSRestController
      *      description="Return list of virtual aliases",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=VirtualAlias::class))
+     *         @OA\Items(ref=@Model(type=VirtualAlias::class, groups={"list"}))
      *      )
      * )
      * @OA\Parameter(
@@ -106,40 +106,6 @@ class VirtualAliasController extends AbstractFOSRestController
     }
 
     /**
-     * The Virtual Alias
-     * 
-     * @Rest\Get(
-     *      "/virtual-aliases/{id}",
-     *      name="virtual_alias_show",
-     *      requirements = {"id"="\d+"}
-     * )
-     * @OA\Response(
-     *      response=200,
-     *      description="Return detail of virtual alias",
-     *      @OA\Schema(type=VirtualAlias::class)
-     * )
-     * @OA\Parameter(
-     *      name="id",
-     *      in="query",
-     *      description="Id of the virtual alias",
-     *      @OA\Schema(type="int")
-     * )
-     * @OA\Tag(name="VirtualAlias")
-     * @param VirtualAlias $virtualAlias
-     * @param SerializerInterface $serializer
-     * @return JsonResponse
-     */
-    public function show(VirtualAlias $virtualAlias, SerializerInterface $serializer): JsonResponse
-    {
-        $data = $serializer->serialize(
-            $virtualAlias,
-            'json',
-            SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getVirtualUsers'))
-        );
-        return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
-    }
-
-    /**
      * Return results of the research
      * 
      * @Rest\Post(
@@ -151,7 +117,7 @@ class VirtualAliasController extends AbstractFOSRestController
      *      description="Return list of virtual aliases according to research",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=VirtualUser::class))
+     *         @OA\Items(ref=@Model(type=VirtualUser::class, groups={"list", "getDomainNames"}))
      *      )
      * )
      * @OA\Tag(name="VirtualUser")
@@ -181,6 +147,40 @@ class VirtualAliasController extends AbstractFOSRestController
             ['accept' => 'json'],
             true
         );
+    }
+
+    /**
+     * The Virtual Alias
+     * 
+     * @Rest\Get(
+     *      "/virtual-aliases/{id}",
+     *      name="virtual_alias_show",
+     *      requirements = {"id"="\d+"}
+     * )
+     * @OA\Response(
+     *      response=200,
+     *      description="Return detail of virtual alias",
+     *      @Model(type=VirtualAlias::class, groups={"list", "getDomainNames", "getVirtualUsers"})
+     * )
+     * @OA\Parameter(
+     *      name="id",
+     *      in="query",
+     *      description="Id of the virtual alias",
+     *      @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="VirtualAlias")
+     * @param VirtualAlias $virtualAlias
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    public function show(VirtualAlias $virtualAlias, SerializerInterface $serializer): JsonResponse
+    {
+        $data = $serializer->serialize(
+            $virtualAlias,
+            'json',
+            SerializationContext::create()->setGroups(array('list', 'getDomainNames', 'getVirtualUsers'))
+        );
+        return new JsonResponse($data, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
     /**

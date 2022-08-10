@@ -57,7 +57,7 @@ class VirtualForwardController extends AbstractFOSRestController
      *      description="Return list of virtual forwards",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=VirtualForward::class))
+     *         @OA\Items(ref=@Model(type=VirtualForward::class, groups={"list"}))
      *      )
      * )
      * @OA\Parameter(
@@ -116,7 +116,7 @@ class VirtualForwardController extends AbstractFOSRestController
      *      description="Return list of virtual forwards according to research",
      *      @OA\JsonContent(
      *         type="array",
-     *         @OA\Items(ref=@Model(type=VirtualUser::class))
+     *         @OA\Items(ref=@Model(type=VirtualUser::class, groups={"list", "getDomainNames"}))
      *      )
      * )
      * @OA\Tag(name="VirtualUser")
@@ -159,7 +159,7 @@ class VirtualForwardController extends AbstractFOSRestController
      * @OA\Response(
      *      response=200,
      *      description="Return detail of virtual forward",
-     *      @OA\Schema(type=VirtualForward::class)
+     *      @Model(type=VirtualForward::class, groups={"list", "getDomainNames", "getVirtualUsers"} )
      * )
      * @OA\Parameter(
      *      name="id",
