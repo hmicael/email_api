@@ -192,7 +192,11 @@ class DomainNameController extends AbstractFOSRestController
      *      response=201,
      *      description="The created domain name"
      * )
-     * @OA\RequestBody(@Model(type=DomainName::class))
+     * @OA\RequestBody(
+     *      description="Domain to be created",
+     *      required=True,
+     *      @Model(type=DomainName::class)
+     * )
      * @OA\Tag(name="DomainName")
      * @ParamConverter("domainName", converter="fos_rest.request_body")
      * @IsGranted("ROLE_ADMIN", message="Only admin can create a domain name")
@@ -249,15 +253,20 @@ class DomainNameController extends AbstractFOSRestController
      *      name="domain_name_edit",
      *      requirements = {"id"="\d+"}
      * )
-     * @OA\Response(
-     *      response=204,
-     *      description="Edit a domain name"
-     * )
      * @OA\Parameter(
      *      name="id",
      *      in="query",
      *      description="Id of the domain name",
      *      @OA\Schema(type="int")
+     * )
+     * @OA\RequestBody(
+     *      description="Domain to be edited",
+     *      required=True,
+     *      @Model(type=DomainName::class)
+     * )
+     * @OA\Response(
+     *      response=204,
+     *      description="Edit a domain name"
      * )
      * @OA\Tag(name="DomainName")
      * @ParamConverter("domainName", converter="fos_rest.request_body")

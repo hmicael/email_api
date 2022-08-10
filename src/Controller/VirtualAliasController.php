@@ -194,7 +194,11 @@ class VirtualAliasController extends AbstractFOSRestController
      *      response=201,
      *      description="The created virtual alias"
      * )
-     * @OA\RequestBody(@Model(type=VirtualAlias::class))
+     * @OA\RequestBody(
+     *      description="VirtualAlias to be created",
+     *      required=True,
+     *      @Model(type=VirtualAlias::class)
+     * )
      * @OA\Tag(name="VirtualAlias")
      *
      * @param Request $request
@@ -273,6 +277,11 @@ class VirtualAliasController extends AbstractFOSRestController
      * @OA\Response(
      *      response=204,
      *      description="Edit a virtual alias"
+     * )
+     * @OA\RequestBody(
+     *      description="VirtualAlias to be edited",
+     *      required=True,
+     *      @Model(type=VirtualAlias::class)
      * )
      * @OA\Parameter(
      *      name="id",

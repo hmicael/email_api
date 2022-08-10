@@ -195,7 +195,11 @@ class VirtualUserController extends AbstractFOSRestController
      *      response=201,
      *      description="The created virtual user"
      * )
-     * @OA\RequestBody(@Model(type=VirtualUser::class))
+     * @OA\RequestBody(
+     *      description="VirtualUser to be created",
+     *      required=True,
+     *      @Model(type=VirtualUser::class)
+     * )
      * @OA\Tag(name="VirtualUser")
      * @param Request $request
      * @param SerializerInterface $serializer
@@ -288,6 +292,11 @@ class VirtualUserController extends AbstractFOSRestController
      * @OA\Response(
      *      response=204,
      *      description="Edit a virtual user"
+     * )
+     * @OA\RequestBody(
+     *      description="VirtualUser to be edited",
+     *      required=True,
+     *      @Model(type=VirtualUser::class)
      * )
      * @OA\Parameter(
      *      name="id",

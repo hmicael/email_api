@@ -193,7 +193,11 @@ class VirtualForwardController extends AbstractFOSRestController
      *      response=201,
      *      description="The created virtual forward"
      * )
-     * @OA\RequestBody(@Model(type=VirtualForward::class))
+     * @OA\RequestBody(
+     *      description="VirtualForward to be created",
+     *      required=True,
+     *      @Model(type=VirtualForward::class)
+     * )
      * @OA\Tag(name="VirtualForward")
      * @param Request $request
      * @param SerializerInterface $serializer
@@ -270,6 +274,11 @@ class VirtualForwardController extends AbstractFOSRestController
      * @OA\Response(
      *      response=204,
      *      description="Edit a virtual forward"
+     * )
+     * @OA\RequestBody(
+     *      description="VirtualForward to be edited",
+     *      required=True,
+     *      @Model(type=VirtualForward::class)
      * )
      * @OA\Parameter(
      *      name="id",

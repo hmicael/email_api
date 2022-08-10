@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=180, unique=true)
      * @Assert\NotBlank(message = "Email cannot be blank")
      * @Assert\Email()
-     * @Groups({"list"})
+     * @Groups({"list", "forgot"})
      */
     private $email;
 
@@ -76,6 +76,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *     min = 8,
      *     minMessage = "Password must be {{ limit }} characters"
      * )
+     * @Groups({"reset"})
      */
     private $password;
 

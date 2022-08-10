@@ -188,11 +188,15 @@ class UserController extends AbstractFOSRestController
      *      path="/users",
      *      name="user_new"
      * )
+     * @OA\RequestBody(
+     *      description="User to be created",
+     *      required=True,
+     *      @Model(type=User::class)
+     * )
      * @OA\Response(
      *      response=201,
      *      description="The created user"
      * )
-     * @OA\RequestBody(@Model(type=User::class))
      * @OA\Tag(name="User")
      * @ParamConverter("user", converter="fos_rest.request_body")
      * @IsGranted("ROLE_ADMIN", message="Only admin can create user")
@@ -256,15 +260,20 @@ class UserController extends AbstractFOSRestController
      *      name="user_edit",
      *      requirements = {"id"="\d+"}
      * )
-     * @OA\Response(
-     *      response=204,
-     *      description="Edit a user"
+     * @OA\RequestBody(
+     *      description="User to be edited",
+     *      required=True,
+     *      @Model(type=User::class)
      * )
      * @OA\Parameter(
      *      name="id",
      *      in="query",
      *      description="Id of the user",
      *      @OA\Schema(type="int")
+     * )
+     * @OA\Response(
+     *      response=204,
+     *      description="Edit a user"
      * )
      * @OA\Tag(name="User")
      * @ParamConverter("user", converter="fos_rest.request_body")

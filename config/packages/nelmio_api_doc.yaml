@@ -1,0 +1,19 @@
+nelmio_api_doc:
+    documentation:
+        servers:
+          - url: http://127.0.0.1:8000
+            description: Email management API over HTTP
+          - url: https://127.0.0.1:8000
+            description: Email management API over HTTP
+        info:
+            title: Email API
+            description: This is a email management app
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -21,6 +22,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+
 
 /**
  * @Route("/api")
@@ -44,6 +47,11 @@ class ResetPasswordController extends AbstractFOSRestController
      * @Rest\Post(
      *      "/users/reset-password/{token}",
      *      name="user_reset_password"
+     * )
+     * @OA\RequestBody(
+     *      description="Email whose password is to be reseted",
+     *      required=True,
+     *      @Model(type=User::class, groups={"reset"})
      * )
      * @OA\Response(
      *      response=204,
@@ -122,6 +130,11 @@ class ResetPasswordController extends AbstractFOSRestController
      * @Rest\Post(
      *      "/users/forgot-password",
      *      name="user_forgot_password"
+     * )
+     * @OA\RequestBody(
+     *      description="Email whose password is to be reseted",
+     *      required=True,
+     *      @Model(type=User::class, groups={"forgot"})
      * )
      * @OA\Response(
      *      response=204,
