@@ -10,6 +10,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -146,6 +147,7 @@ class ResetPasswordController extends AbstractFOSRestController
      * @param SerializerInterface $serializer
      * @param ValidatorInterface $validator
      * @param MailerInterface $mailer
+     * @param ContainerBagInterface $params 
      * @return JsonResponse
      */
     public function processSendingPasswordResetEmail(
@@ -153,7 +155,8 @@ class ResetPasswordController extends AbstractFOSRestController
         UserRepository $userRepository,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        ContainerBagInterface $params
     ): JsonResponse
     {
         $content = $request->toArray();
@@ -209,6 +212,7 @@ class ResetPasswordController extends AbstractFOSRestController
             ->htmlTemplate('email/reset_password.html.twig')
             ->context([
                 'resetToken' => $resetToken,
+                'front_url' => $params->get('front_url')
             ]);
         $mailer->send($email);
 
