@@ -95,6 +95,13 @@ class VirtualAliasController extends AbstractFOSRestController
             function (ItemInterface $item) use ($virtualAliasRepository, $serializer, $page, $limit) {
                 $item->tag("virtualAliasesCache");
                 $data = $virtualAliasRepository->findAllWithPagination($page, $limit);
+                $total = $virtualAliasRepository->getTotalElement();
+                $data = [
+                    "page" => (int) $page,
+                    "limit" => (int) $limit,
+                    "total" => (int) $total,
+                    "data" => $data
+                ];
                 return $serializer->serialize(
                     $data,
                     'json',

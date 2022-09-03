@@ -92,6 +92,13 @@ class DomainNameController extends AbstractFOSRestController
             function (ItemInterface $item) use ($domainNameRepository, $serializer, $page, $limit) {
                 $item->tag("domaineNamesCache");
                 $data = $domainNameRepository->findAllWithPagination($page, $limit);
+                $total = $domainNameRepository->getTotalElement();
+                $data = [
+                    "page" => (int) $page,
+                    "limit" => (int) $limit,
+                    "total" => (int) $total,
+                    "data" => $data
+                ];
                 return $serializer->serialize(
                     $data,
                     'json',

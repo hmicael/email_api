@@ -92,6 +92,13 @@ class UserController extends AbstractFOSRestController
             function (ItemInterface $item) use ($userRepository, $serializer, $page, $limit) {
                 $item->tag("usersCache");
                 $data = $userRepository->findAllWithPagination($page, $limit);
+                $total = $userRepository->getTotalElement();
+                $data = [
+                    "page" => (int) $page,
+                    "limit" => (int) $limit,
+                    "total" => (int) $total,
+                    "data" => $data
+                ];
                 return $serializer->serialize(
                     $data,
                     'json',

@@ -94,6 +94,13 @@ class VirtualUserController extends AbstractFOSRestController
             function (ItemInterface $item) use ($virtualUserRepository, $serializer, $page, $limit) {
                 $item->tag("virtualUserCache");
                 $data = $virtualUserRepository->findAllWithPagination($page, $limit);
+                $total = $virtualUserRepository->getTotalElement();
+                $data = [
+                    "page" => (int) $page,
+                    "limit" => (int) $limit,
+                    "total" => (int) $total,
+                    "data" => $data
+                ];
                 return $serializer->serialize(
                     $data,
                     'json',

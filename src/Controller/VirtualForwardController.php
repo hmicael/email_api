@@ -94,6 +94,13 @@ class VirtualForwardController extends AbstractFOSRestController
             function (ItemInterface $item) use ($virtualForwardRepository, $serializer, $page, $limit) {
                 $item->tag("virtualForwardsCache");
                 $data = $virtualForwardRepository->findAllWithPagination($page, $limit);
+                $total = $virtualForwardRepository->getTotalElement();
+                $data = [
+                    "page" => (int) $page,
+                    "limit" => (int) $limit,
+                    "total" => (int) $total,
+                    "data" => $data
+                ];
                 return $serializer->serialize(
                     $data,
                     'json',
